@@ -1,0 +1,99 @@
+/*
+    DLTReader Diagnostic Log and Trace reading library
+    Copyright (C) 2023 Andrei Borovsky <andrey.borovsky@gmail.com>
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*/
+
+#ifndef DLTFILEPARSER_H
+#define DLTFILEPARSER_H
+extern "C" {
+#include "dlt_common.h"
+}
+#include <string>
+#include <vector>
+#include <iterator>
+
+using length_t = uint16_t;
+
+struct DLTFileRecordRaw
+{
+    uint32_t num = 0;
+    uint64_t offset = 0;
+    bool good = true;
+    length_t length = 0;
+    char * msg = nullptr;
+    bool operator == (const DLTFileRecordRaw & other) const;
+};
+
+using RecordCollection = std::vector<DLTFileRecordRaw>;
+using BufPtr = char*;
+
+enum class ParserState {
+    HaveRecord = 0,
+    NeedMoreData,
+    EndOfFile,
+    Error
+};
+
+class DLTFileRecordIterator;
+class DLTFileParser
+{
+public:
+    explicit DLTFileParser(const std::string & fileName);
+    virtual ~DLTFileParser();
+    const std::string &fileName();
+    virtual bool init();
+    virtual void reset();
+    ParserState parse(DLTFileRecordRaw & record);
+    ParserState parseBatch(RecordCollection & records);
+    int32_t recordsCount();
+    DLTFileRecordIterator begin();
+    DLTFileRecordIterator end();
+protected:
+    virtual bool resetFile() = 0;
+    virtual uint64_t readFile(BufPtr &buf) = 0;
+    virtual void seek(uint64_t pos) = 0;
+    virtual void closeFile() = 0;
+private:
+    const int32_t TotalHeaderSize = sizeof(DltStorageHeader) + sizeof(DltStandardHeader);
+    bool endOfRecords = false;
+    uint32_t mRecordsCount = 0;
+    std::string mFileName;
+    uint64_t currentMsgPosGlobal = 0;
+    uint64_t nextMsgPosGlobal = 0;
+    uint64_t bytesReadTotal = 0;
+    uint32_t bytesRead = 0;
+    int32_t currentMsgPosLocal = 0;
+    uint32_t nextMsgPosLocal = 0;
+    uint64_t localMsgOffset = 0;
+    BufPtr buffer = nullptr;
+    ParserState processLastRecord(DLTFileRecordRaw & record);
+    bool nextCallWillRead();
+};
+
+class DLTFileRecordIterator
+{
+public:
+    explicit DLTFileRecordIterator(DLTFileParser * p = nullptr);
+    typedef DLTFileRecordRaw value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef DLTFileRecordRaw * pointer;
+    typedef DLTFileRecordRaw & reference;
+    typedef std::input_iterator_tag iterator_category;
+    DLTFileRecordRaw operator * () const;
+    bool operator ==(const DLTFileRecordIterator & other) const;
+    bool operator !=(const DLTFileRecordIterator & other) const;
+    DLTFileRecordIterator & operator ++ ();
+private:
+    DLTFileParser * parser;
+    DLTFileRecordRaw record;
+};
+
+
+
+#endif // DLTFILEPARSER_H
