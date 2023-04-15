@@ -42,22 +42,22 @@ struct TextId {
         (*this) = other.data();
         return (*this);
     }
-    bool operator ==(const TextId & other) {
+    bool operator ==(const TextId & other) const {
         return data[0] == other.data[0] && data[1] == other.data[1] && data[2] == other.data[2] && data[3] == other.data[3];
     }
-    bool operator !=(const TextId & other) {
+    bool operator !=(const TextId & other) const {
         return !(*this == other);
     }
-    bool operator ==(const char * other) {
+    bool operator ==(const char * other) const {
         return data[0] == other[0] && data[1] == other[1] && data[2] == other[2] && data[3] == other[3];
     }
-    bool operator !=(const char * & other) {
+    bool operator !=(const char * & other) const {
         return !(*this == other);
     }
-    bool operator ==(const std::string & other) {
+    bool operator ==(const std::string & other) const {
         return *this == other.data();
     }
-    bool operator !=(const std::string & other) {
+    bool operator !=(const std::string & other) const {
         return !(*this == other);
     }
 };

@@ -131,7 +131,7 @@ void CachedDLTFile::passBufferToProducer(CachedBuffer &buf)
 void CachedDLTFile::waitForProducerReady()
 {
     std::unique_lock<std::mutex> lk(mutex);
-    cv.wait(lk, [this](){if (buffers[nextBufferToProduce].state == BufferState::bsReadyForProducer) return true; return false;});
+    cv.wait(lk, [this](){return buffers[nextBufferToProduce].state == BufferState::bsReadyForProducer | mEof;});
 }
 
 void CachedDLTFile::waitForConsumerReady(CachedBuffer &buf)
