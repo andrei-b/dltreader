@@ -37,7 +37,7 @@ class CachedDLTFile : public DLTFileParser
 public:
     explicit CachedDLTFile(const std::string & fileName);
     virtual ~CachedDLTFile();
-    bool eof();
+    bool eof() const;
     bool init() override;
     void reset() override;
 protected:

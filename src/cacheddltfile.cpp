@@ -27,7 +27,7 @@ CachedDLTFile::~CachedDLTFile()
     closeFile();
 }
 
-bool CachedDLTFile::eof()
+bool CachedDLTFile::eof() const
 {
     return mEof;
 }
