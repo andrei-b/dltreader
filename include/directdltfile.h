@@ -18,6 +18,8 @@
 #include<iostream>
 #include<fstream>
 
+namespace DLTFile {
+
 class DirectDLTFile : public DLTFileParser
 {
     static const uint64_t BufferSize = 4096*1024; // this should be greater than the maximum size of the dlt message (64k).
@@ -33,5 +35,7 @@ private:
     std::ifstream mFile;
     std::vector<char> buffer;
 };
+
+}
 
 #endif // DIRECTDLTFILE_H

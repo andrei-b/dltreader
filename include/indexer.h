@@ -16,6 +16,8 @@
 #include <memory>
 #include <vector>
 
+namespace DLTFile {
+
 using Index = std::vector<uint64_t>;
 struct SparceRecord
 {
@@ -35,5 +37,7 @@ public:
 private:
     DLTFileParser & parser;
 };
+
+}
 
 #endif // INDEXER_H

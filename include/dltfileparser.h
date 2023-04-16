@@ -11,12 +11,12 @@
 
 #ifndef DLTFILEPARSER_H
 #define DLTFILEPARSER_H
-extern "C" {
-#include "dlt_common.h"
-}
+
 #include <string>
 #include <vector>
 #include <iterator>
+
+namespace DLTFile {
 
 using length_t = uint16_t;
 
@@ -60,7 +60,6 @@ protected:
     virtual void seek(uint64_t pos) = 0;
     virtual void closeFile() = 0;
 private:
-    const int32_t TotalHeaderSize = sizeof(DltStorageHeader) + sizeof(DltStandardHeader);
     bool endOfRecords = false;
     uint32_t mRecordsCount = 0;
     std::string mFileName;
@@ -94,6 +93,6 @@ private:
     DLTFileRecordRaw record;
 };
 
-
+}
 
 #endif // DLTFILEPARSER_H

@@ -20,6 +20,8 @@
 #include<iostream>
 #include<fstream>
 
+namespace DLTFile {
+
 class CachedDLTFile : public DLTFileParser
 {
     static const uint BufferCount = 2; // do not change
@@ -70,5 +72,7 @@ private:
     void produce();
     void runCache();
 };
+
+}
 
 #endif // CACHEDDLTFILE_H

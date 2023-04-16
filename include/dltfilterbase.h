@@ -14,11 +14,15 @@
 
 #include "dltfileparser.h"
 
+namespace DLTFile {
+
 class DLTFilterBase
 {
 public:
     bool virtual match(const DLTFileRecordRaw & record) = 0;
     bool virtual match(const RecordCollection & records) = 0;
 };
+
+}
 
 #endif // DLTFILTERBASE_H

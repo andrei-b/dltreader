@@ -10,11 +10,28 @@
 */
 
 #include "dltrecordparser.h"
+extern "C" {
+#include "dlt_common.h"
+}
 
-DLTRecordParser::DLTRecordParser()
+
+namespace DLTFile {
+
+
+struct DLTRecordParser::Headers {
+    DltStorageHeader * storageHeader = nullptr;
+    DltStandardHeader * standardHeader = nullptr;
+    DltExtendedHeader * extendedHeader = nullptr;
+    DltStandardHeaderExtra headerExtra;
+};
+
+DLTRecordParser::DLTRecordParser() : headers(new Headers())
 {
+}
 
-
+DLTRecordParser::~DLTRecordParser()
+{
+    delete(headers);
 }
 
 const uint16_t StorageHeaderSize = sizeof(DltStorageHeader);
@@ -30,6 +47,11 @@ bool DLTRecordParser::parseHeaders(const DLTFileRecordRaw &record)
         good = false;
         return false;
     }
+    auto & storageHeader = headers->storageHeader;
+    auto & standardHeader = headers->standardHeader;
+    auto & extendedHeader = headers->extendedHeader;
+    auto & headerExtra = headers->headerExtra;
+
     storageHeader = (DltStorageHeader*) record.msg;
     standardHeader = (DltStandardHeader*)(((char*)record.msg) + StorageHeaderSize);
     length_t extra_size = DLT_STANDARD_HEADER_EXTRA_SIZE(standardHeader->htyp)+(DLT_IS_HTYP_UEH(standardHeader->htyp) ? ExtendedHeaderSize : 0);
@@ -79,6 +101,11 @@ bool DLTRecordParser::parseHeaders(const DLTFileRecordRaw &record)
 
 void DLTRecordParser::extractFileRecord(DLTFileRecordParsed &out)
 {
+    auto & storageHeader = headers->storageHeader;
+    auto & standardHeader = headers->standardHeader;
+    auto & extendedHeader = headers->extendedHeader;
+    auto & headerExtra = headers->headerExtra;
+
     out.num = messageNumber;
     out.offset = offset;
     out.good = good;
@@ -123,5 +150,7 @@ void DLTRecordParser::extractFileRecord(DLTFileRecordParsed &out)
 
 DLTFileRecordRaw &parseFileRecordHeaders(DLTFileRecordRaw &record)
 {
+
+}
 
 }

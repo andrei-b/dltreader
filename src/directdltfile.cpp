@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <stdio.h>
 
+namespace DLTFile {
+
 DirectDLTFile::DirectDLTFile(const std::string &fileName) : DLTFileParser(fileName)
 {
     buffer.reserve(BufferSize);
@@ -50,3 +52,4 @@ void DirectDLTFile::closeFile()
     mFile.close();
 }
 
+}

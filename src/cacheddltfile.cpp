@@ -14,6 +14,8 @@
 #include <thread>
 #include <stdio.h>
 
+namespace DLTFile {
+
 CachedDLTFile::CachedDLTFile(const std::string &fileName) : DLTFileParser(fileName)
 {
     for (auto &b : buffers)
@@ -217,4 +219,6 @@ void CachedDLTFile::produce()
     }
     producerFinished = true;
     wake();
+}
+
 }

@@ -15,6 +15,8 @@
 #include "dltrecordparser.h"
 #include "dltfileparser.h"
 
+namespace DLTFile {
+
 class ParsedRecordIterator;
 class ParsedRecordsCollection
 {
@@ -44,5 +46,7 @@ private:
     DLTFileParser * fileParser;
     DLTFileRecordParsed record;
 };
+
+}
 
 #endif // PARSEDRECORDSCOLLECTION_H

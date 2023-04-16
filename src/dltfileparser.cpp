@@ -11,6 +11,13 @@
 
 #include "dltfileparser.h"
 #include "string.h"
+extern "C" {
+#include "dlt_common.h"
+}
+
+namespace DLTFile {
+
+const int32_t TotalHeaderSize = sizeof(DltStorageHeader) + sizeof(DltStandardHeader);
 
 DLTFileParser::DLTFileParser(const std::string &fileName) : mFileName(fileName)
 {
@@ -206,4 +213,6 @@ DLTFileRecordIterator &DLTFileRecordIterator::operator ++()
 bool DLTFileRecordRaw::operator ==(const DLTFileRecordRaw &other) const
 {
     return this->num == other.num && this->offset == other.offset && this->good == other.good && this->length == other.length && this->msg == other.msg;
+}
+
 }

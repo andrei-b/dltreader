@@ -17,6 +17,8 @@
 #include <vector>
 #include <memory>
 
+namespace DLTFile {
+
 DLTFileRecordRaw & parseFileRecordHeaders(DLTFileRecordRaw & record);
 
 struct TextId {
@@ -97,19 +99,20 @@ class DLTRecordParser
 {
 public:
     DLTRecordParser();
+    ~DLTRecordParser();
     bool parseHeaders(const DLTFileRecordRaw &record);
     void extractFileRecord(DLTFileRecordParsed & out);
 private:
+    struct Headers;
     uint32_t messageNumber;
     uint64_t offset;
     bool good;
-    DltStorageHeader * storageHeader = nullptr;
-    DltStandardHeader * standardHeader = nullptr;
-    DltExtendedHeader * extendedHeader = nullptr;
-    DltStandardHeaderExtra headerExtra;
+    Headers * headers;
     length_t payloadSize = 0;
     length_t headerSize = 0;
     std::shared_ptr<std::vector<char>> payloadPtr;
 };
+
+}
 
 #endif // DLTRECORDPARSER_H

@@ -11,6 +11,8 @@
 
 #include "indexer.h"
 
+namespace DLTFile {
+
 Indexer::Indexer(DLTFileParser &p) : parser(p)
 {
 
@@ -39,5 +41,7 @@ SparceIndex Indexer::makeFilteredIndex(const DLTFilterBase &filter)
 
 SparceIndex Indexer::narrowIndex(const DLTFilterBase &filter, const SparceIndex &source)
 {
+
+}
 
 }

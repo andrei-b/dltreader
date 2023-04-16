@@ -13,5 +13,5 @@ install(TARGETS dltreader
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 add_executable(catdlt examples/catdlt.cpp)
-target_include_directories(catdlt PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src/dltbase)
+target_include_directories(catdlt PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(catdlt dltreader)

@@ -11,6 +11,8 @@
 
 #include "parsedrecordscollection.h"
 
+namespace DLTFile {
+
 ParsedRecordsCollection::ParsedRecordsCollection(DLTFileParser &p) : parser(p)
 {
 
@@ -66,3 +68,4 @@ ParsedRecordIterator &ParsedRecordIterator::operator ++()
     return *this;
 }
 
+}
