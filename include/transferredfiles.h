@@ -9,20 +9,28 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#ifndef DLTFILTERBASE_H
-#define DLTFILTERBASE_H
+#ifndef TRANSFERREDFILES_H
 
-#include "dltfileparser.h"
+#define TRANSFERREDFILES_H
+
+#include "dltrecordparser.h"
+#include "parsedrecordscollection.h"
+#include <string>
 
 namespace DLTFile {
 
-class DLTFilterBase
+class TransferredFiles
 {
 public:
-    bool virtual match(const DLTFileRecordRaw & record) = 0;
-    bool virtual match(const RecordCollection & records) = 0;
+    TransferredFiles(ParsedRecordIterator & begin, ParsedRecordIterator & end);
+    bool findFile();
+    std::string currentFileName() const;
+    std::string currentFileDate() const;
+    uint64_t currentFileSize() const;
+    uint32_t currentFileId() const;
+    bool saveCurrentFile(const std::string & filename);
 };
 
 }
 
-#endif // DLTFILTERBASE_H
+#endif // TRANSFERREDFILES_H

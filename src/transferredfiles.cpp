@@ -9,20 +9,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#ifndef DLTFILTERBASE_H
-#define DLTFILTERBASE_H
-
-#include "dltfileparser.h"
+#include "transferredfiles.h"
 
 namespace DLTFile {
 
-class DLTFilterBase
+TransferredFiles::TransferredFiles(ParsedRecordIterator & begin, ParsedRecordIterator & end)
 {
-public:
-    bool virtual match(const DLTFileRecordRaw & record) = 0;
-    bool virtual match(const RecordCollection & records) = 0;
-};
 
 }
 
-#endif // DLTFILTERBASE_H
+}
