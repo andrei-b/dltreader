@@ -77,6 +77,17 @@ enum class DLTLogMode {
     NonVerbose
 };
 
+struct Payload {
+    void set(const char * src, uint16_t length)
+    {
+       data = std::shared_ptr<char[]>(new char[length + 64 - (length%64)]);
+       len = length;
+       std::copy(src, src+length, &data[0]);
+    }
+    std::shared_ptr<char[]> data;
+    uint16_t len;
+};
+
 struct DLTFileRecordParsed
 {
     uint32_t num = 0;
@@ -92,7 +103,8 @@ struct DLTFileRecordParsed
     uint32_t seconds = 0;
     uint32_t microseconds = 0;
     uint32_t timestamp = 0;
-    std::shared_ptr<std::vector<char>> payloadPtr;
+    uint32_t payloadSize;
+    Payload payload;
 };
 
 class DLTRecordParser
@@ -110,7 +122,7 @@ private:
     Headers * headers;
     length_t payloadSize = 0;
     length_t headerSize = 0;
-    std::shared_ptr<std::vector<char>> payloadPtr;
+    char * payloadPtr;
 };
 
 }

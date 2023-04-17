@@ -22,13 +22,16 @@ namespace DLTFile {
 class TransferredFiles
 {
 public:
-    TransferredFiles(ParsedRecordIterator & begin, ParsedRecordIterator & end);
+    TransferredFiles(ParsedRecordIterator begin, ParsedRecordIterator end);
     bool findFile();
     std::string currentFileName() const;
     std::string currentFileDate() const;
     uint64_t currentFileSize() const;
     uint32_t currentFileId() const;
     bool saveCurrentFile(const std::string & filename);
+private:
+    ParsedRecordIterator & current;
+    ParsedRecordIterator & end;
 };
 
 }

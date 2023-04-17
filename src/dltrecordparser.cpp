@@ -60,10 +60,9 @@ bool DLTRecordParser::parseHeaders(const DLTFileRecordRaw &record)
         payloadSize = 0;
     else
         payloadSize =  DLT_SWAP_16(standardHeader->len) - (headerSize - StorageHeaderSize);
-    if (payloadPtr == nullptr)
-        payloadPtr.reset(new std::vector<char>());
-    else
-        payloadPtr->clear();
+    //if (payloadPtr == nullptr)
+    //    payloadPtr.reset(new std::vector<char>());
+    //else
     if (record.length  < (int)(headerSize)) {
         good = false;
         return false;
@@ -95,7 +94,7 @@ bool DLTRecordParser::parseHeaders(const DLTFileRecordRaw &record)
         good = false;
         return false;
     }
-    payloadPtr->insert(payloadPtr->end(), record.msg + headerSize, record.msg + headerSize + payloadSize);
+    payloadPtr = record.msg;
     return true;
 }
 
@@ -142,7 +141,8 @@ void DLTRecordParser::extractFileRecord(DLTFileRecordParsed &out)
         }
     } else
         out.mode = DLTLogMode::NonVerbose;
-    out.payloadPtr = payloadPtr;
+    out.payloadSize = payloadSize;
+    out.payload.set(payloadPtr + headerSize, payloadSize);
     out.sessionId = headerExtra.seid;
 }
 
