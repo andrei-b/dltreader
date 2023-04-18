@@ -147,12 +147,12 @@ int32_t DLTFileParser::recordsCount()
 
 DLTFileRecordIterator DLTFileParser::begin()
 {
-    return DLTFileRecordIterator(this);
+    return DLTFileRecordIterator(*this);
 }
 
 DLTFileRecordIterator DLTFileParser::end()
 {
-    return DLTFileRecordIterator();
+    return DLTFileRecordIterator(*this, true);
 }
 
 ParserState DLTFileParser::processLastRecord(DLTFileRecordRaw &record)
@@ -174,11 +174,12 @@ bool DLTFileParser::nextCallWillRead()
     return nextMsgPosGlobal >= bytesReadTotal;
 }
 
-DLTFileRecordIterator::DLTFileRecordIterator(DLTFileParser *p) : parser(p)
+DLTFileRecordIterator::DLTFileRecordIterator(DLTFileParser &p, bool end) : parser(p), atEnd(end)
 {
-    if (parser != nullptr)
-        parser->init();
-    ++(*this);
+    if (!atEnd) {
+        parser.init();
+        ++(*this);
+    }
 }
 
 DLTFileRecordRaw DLTFileRecordIterator::operator *() const
@@ -188,7 +189,7 @@ DLTFileRecordRaw DLTFileRecordIterator::operator *() const
 
 bool DLTFileRecordIterator::operator ==(const DLTFileRecordIterator &other) const
 {
-    return record == other.record && parser == other.parser;
+    return record == other.record && atEnd == other.atEnd;
 }
 
 bool DLTFileRecordIterator::operator !=(const DLTFileRecordIterator &other) const
@@ -198,13 +199,13 @@ bool DLTFileRecordIterator::operator !=(const DLTFileRecordIterator &other) cons
 
 DLTFileRecordIterator &DLTFileRecordIterator::operator ++()
 {
-    if (parser != nullptr) {
-        auto state = parser->parse(record);
+    if (!atEnd) {
+        auto state = parser.parse(record);
         while (state == ParserState::NeedMoreData)
-            state = parser->parse(record);
+            state = parser.parse(record);
         if (state != ParserState::HaveRecord) {
             record = {0,0,true,0,nullptr};
-            parser = nullptr;
+            atEnd = true;
         }
     }
     return *this;

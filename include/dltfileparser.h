@@ -78,7 +78,7 @@ private:
 class DLTFileRecordIterator
 {
 public:
-    explicit DLTFileRecordIterator(DLTFileParser * p = nullptr);
+    explicit DLTFileRecordIterator(DLTFileParser & p, bool end = false);
     typedef DLTFileRecordRaw value_type;
     typedef std::ptrdiff_t difference_type;
     typedef DLTFileRecordRaw * pointer;
@@ -89,8 +89,9 @@ public:
     bool operator !=(const DLTFileRecordIterator & other) const;
     DLTFileRecordIterator & operator ++ ();
 private:
-    DLTFileParser * parser;
+    DLTFileParser & parser;
     DLTFileRecordRaw record;
+    bool atEnd;
 };
 
 }

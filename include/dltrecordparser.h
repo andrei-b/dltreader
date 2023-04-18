@@ -83,7 +83,7 @@ enum class DLTLogMode {
 struct Payload {
     void set(const char * src, uint16_t length)
     {
-       data = std::shared_ptr<char[]>(new char[length + 64 - (length%64)]);
+       data.reset(new char[length + 64 - (length%64)]);
        len = length;
        std::copy(src, src+length, &data[0]);
     }

@@ -20,19 +20,20 @@ ParsedRecordsCollection::ParsedRecordsCollection(DLTFileParser &p) : parser(p)
 
 ParsedRecordIterator ParsedRecordsCollection::begin()
 {
-    return ParsedRecordIterator(&parser);
+    return ParsedRecordIterator(parser);
 }
 
 ParsedRecordIterator ParsedRecordsCollection::end()
 {
-    return ParsedRecordIterator();
+    return ParsedRecordIterator(parser, true);
 }
 
-ParsedRecordIterator::ParsedRecordIterator(DLTFileParser *p) : fileParser(p)
+ParsedRecordIterator::ParsedRecordIterator(DLTFileParser &p, bool end) : fileParser(p), atEnd(end)
 {
-    if (fileParser != nullptr)
-        fileParser->init();
-    ++(*this);
+    if (!atEnd) {
+        fileParser.init();
+        ++(*this);
+    }
 }
 
 DLTFileRecordParsed ParsedRecordIterator::operator *() const
@@ -42,7 +43,7 @@ DLTFileRecordParsed ParsedRecordIterator::operator *() const
 
 bool ParsedRecordIterator::operator ==(const ParsedRecordIterator &other) const
 {
-    return record.num == other.record.num && fileParser == other.fileParser;
+    return record.num == other.record.num && atEnd == other.atEnd;
 }
 
 bool ParsedRecordIterator::operator !=(const ParsedRecordIterator &other) const
@@ -52,14 +53,14 @@ bool ParsedRecordIterator::operator !=(const ParsedRecordIterator &other) const
 
 ParsedRecordIterator &ParsedRecordIterator::operator ++()
 {
-    if (fileParser != nullptr) {
+    if (!atEnd) {
         DLTFileRecordRaw r;
-        auto state = fileParser->parse(r);
+        auto state = fileParser.parse(r);
         while (state == ParserState::NeedMoreData)
-            state = fileParser->parse(r);
+            state = fileParser.parse(r);
         if (state != ParserState::HaveRecord) {
             record.num = 0;
-            fileParser = nullptr;
+            atEnd = true;
         } else {
             recordParser.parseHeaders(r);
             recordParser.extractFileRecord(record);
