@@ -31,7 +31,7 @@ private:
 class ParsedRecordIterator
 {
 public:
-    explicit ParsedRecordIterator(DLTFileParser & p, bool end = false);
+    explicit ParsedRecordIterator(DLTFileParser & p, bool end);
     typedef DLTFileRecordParsed value_type;
     typedef std::ptrdiff_t difference_type;
     typedef DLTFileRecordParsed * pointer;

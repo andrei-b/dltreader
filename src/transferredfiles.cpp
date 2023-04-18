@@ -10,6 +10,7 @@
 */
 
 #include "transferredfiles.h"
+#include "dltrecordparser.h"
 #include <algorithm>
 
 namespace DLTFile {
@@ -64,34 +65,53 @@ namespace Package {
     };
 }
 
-TransferredFiles::TransferredFiles(ParsedRecordIterator begin, ParsedRecordIterator end) : current(begin), end(end)
+TransferredFiles::TransferredFiles(DLTFileRecordIterator begin, DLTFileRecordIterator end) : current(begin), end(end)
 {
 
 }
 
 bool TransferredFiles::findFile()
 {
+    DLTRecordParser p;
     char flst[5] = {'F','L','S','T', '\0'};
     std::vector<char> Flst = {'F','L','S','T', '\0'};
     uint32_t * ptr = (uint32_t *)flst;
-    //++current;
     while(current != end) {
-        if ((*current).payloadSize > 10) {
-            uint32_t * ptr2 = (uint32_t *)&(*current).payload.data[6];
+        p.parseHeaders(*current);
+        //auto r = p.extractRecord();
+        if (p.payloadLength() > 10) {
+            uint32_t * ptr2 = (uint32_t *)(p.payloadPointer()+6);
             if (*ptr == *ptr2) {
-                Package::PackageParser p(&(*current).payload.data[0], (*current).payload.len);
-                auto v1 = p.readValue();
-                auto v2 = p.readValue();
-                auto v3 = p.readValue();
-                auto v4 = p.readValue();
-                auto v5 = p.readValue();
-                auto v6 = p.readValue();
+                Package::PackageParser pp(p.payloadPointer(), p.payloadLength());
+                auto tag = pp.readValue();
+                if (tag.stringval != "FLST") {
+                    ++current;
+                    continue;
+                }
+                auto id = pp.readValue();
+                auto name = pp.readValue();
+                fileName = name.stringval;
+                auto size = pp.readValue();
+                auto date = pp.readValue();
+                auto blocks = pp.readValue();
+                auto bsize = pp.readValue();
+                tag  = pp.readValue();
+                if (tag.stringval != "FLST") {
+                    ++current;
+                    continue;
+                }
+                ++current;
                 return true;
             }
         }
         ++current;
     }
     return false;
+}
+
+std::string TransferredFiles::currentFileName() const
+{
+    return fileName;
 }
 
 }

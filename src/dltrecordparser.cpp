@@ -82,13 +82,26 @@ bool DLTRecordParser::parseHeaders(const DLTFileRecordRaw &record)
         good = false;
         return false;
     }
-    payloadPtr = record.msg;
+    payloadPtr = record.msg + headerSize;
     return true;
 }
 
-void DLTRecordParser::extractFileRecord(DLTFileRecordParsed &out)
+char *DLTRecordParser::payloadPointer()
+{
+    return payloadPtr;
+}
+
+uint16_t DLTRecordParser::payloadLength()
+{
+    if (!good)
+        return 0;
+    return payloadSize;
+}
+
+DLTFileRecordParsed DLTRecordParser::extractRecord()
 {
 
+    DLTFileRecordParsed out;
     out.num = messageNumber;
     out.offset = offset;
     out.good = good;
@@ -126,8 +139,9 @@ void DLTRecordParser::extractFileRecord(DLTFileRecordParsed &out)
     } else
         out.mode = DLTLogMode::NonVerbose;
     out.payloadSize = payloadSize;
-    out.payload.set(payloadPtr + headerSize, payloadSize);
+    out.set(payloadPtr, payloadSize);
     out.sessionId = headerExtra.seid;
+    return out;
 }
 
 

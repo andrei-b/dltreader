@@ -83,9 +83,9 @@ enum class DLTLogMode {
 struct Payload {
     void set(const char * src, uint16_t length)
     {
-       data.reset(new char[length + 64 - (length%64)]);
+       data.reset(new char[length]);
        len = length;
-       std::copy(src, src+length, &data[0]);
+       std::copy(src, src+length, data.get());
     }
     std::shared_ptr<char[]> data;
     uint16_t len;
@@ -107,7 +107,14 @@ struct DLTFileRecordParsed
     uint32_t microseconds = 0;
     uint32_t timestamp = 0;
     uint32_t payloadSize;
-    Payload payload;
+    void set(const char * src, uint16_t length)
+    {
+       data.reset(new char[length]);
+       len = length;
+       std::copy(src, src+length, data.get());
+    }
+    std::shared_ptr<char[]> data;
+    uint16_t len;
 };
 
 class DLTRecordParser
@@ -116,7 +123,9 @@ public:
     DLTRecordParser();
     ~DLTRecordParser();
     bool parseHeaders(const DLTFileRecordRaw &record);
-    void extractFileRecord(DLTFileRecordParsed & out);
+    char * payloadPointer();
+    uint16_t payloadLength();
+    DLTFileRecordParsed extractRecord();
 private:
     DltStorageHeader * storageHeader = nullptr;
     DltStandardHeader * standardHeader = nullptr;

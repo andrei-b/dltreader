@@ -20,7 +20,7 @@ ParsedRecordsCollection::ParsedRecordsCollection(DLTFileParser &p) : parser(p)
 
 ParsedRecordIterator ParsedRecordsCollection::begin()
 {
-    return ParsedRecordIterator(parser);
+    return ParsedRecordIterator(parser, false);
 }
 
 ParsedRecordIterator ParsedRecordsCollection::end()
@@ -63,7 +63,7 @@ ParsedRecordIterator &ParsedRecordIterator::operator ++()
             atEnd = true;
         } else {
             recordParser.parseHeaders(r);
-            recordParser.extractFileRecord(record);
+            record = recordParser.extractRecord();
         }
     }
     return *this;

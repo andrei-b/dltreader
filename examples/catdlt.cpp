@@ -23,19 +23,19 @@ using namespace std;
 
 int main()
 {
-        DLTFile::CachedDLTFile f("/home/andrei/Downloads/joinf.dlt");
+        DLTFile::DirectDLTFile f("/home/andrei/Downloads/joinf.dlt");
         /*if (!f.init()) {
             printf("Init failed\n");
             return 0;
         }*/
-        DLTFile::Indexer idx(f);
-        auto index = idx.makeIndex();
-        printf ("index: %i\n", index.size());
-        f.reset();
+        //DLTFile::Indexer idx(f);
+        //auto index = idx.makeIndex();
+        //printf ("index: %i\n", index.size());
+        //f.reset();
         DLTFile::ParsedRecordsCollection records(f);
-        DLTFile::TransferredFiles files(records.begin(), records.end());
+        DLTFile::TransferredFiles files(f.begin(), f.end());
         while (files.findFile())
-            printf("FOUND\n");
+            printf("%s\n", files.currentFileName().data());
 
       /*  for(const DLTFile::DLTFileRecordParsed & record : records) {
             //printf("%i:%s\n", record.num, record.ecu.data);
