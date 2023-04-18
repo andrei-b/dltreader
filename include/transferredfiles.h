@@ -26,13 +26,18 @@ public:
     bool findFile();
     std::string currentFileName() const;
     std::string currentFileDate() const;
-    uint64_t currentFileSize() const;
+    uint32_t currentFileSize() const;
     uint32_t currentFileId() const;
     bool saveCurrentFile(const std::string & filename);
 private:
     DLTFileRecordIterator current;
     DLTFileRecordIterator end;
     std::string fileName;
+    uint32_t fileSize;
+    uint32_t blocks;
+    uint32_t bsize;
+    uint32_t fileId;
+    std::string fileDate;
 };
 
 }

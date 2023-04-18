@@ -27,10 +27,31 @@ namespace Package {
         ValueType type = ValueType::None;
         uint32_t i32val = 0;
         std::string stringval;
+        operator std::string() const
+        {
+            return stringval;
+        }
+        operator uint32_t() const
+        {
+            return i32val;
+        }
+        bool operator == (const std::string & other)
+        {
+            return stringval == other;
+        }
+        bool operator == (const uint32_t & other)
+        {
+            return i32val == other;
+        }
+        template<typename T>
+        bool operator != (const T & other)
+        {
+            return !(*this == other);
+        }
     };
     class PackageParser {
     public:
-        PackageParser(const char * text, uint16_t len) : mText(text), mLength(len)
+        PackageParser(const char * text, uint16_t len) : mText(text), length(len)
         {
             std::vector<char> v;
             for(int i = 0; i < len; ++i)  //REMOVE
@@ -40,27 +61,28 @@ namespace Package {
         Value readValue()
         {
             Value result;
-            result.type = (ValueType)*((uint32_t *) (mText + pos));
-            pos += 4;
-            if (result.type == ValueType::String) {
-                uint16_t valueLen = *((uint16_t *)(mText + pos));
-                pos += 2;
-                if (valueLen != 0) {
-                    for(int i = pos; i < pos + valueLen - 1; ++i) // chopping off terminating 0
-                        result.stringval += mText[i];
-                    pos += valueLen;
+            if (pos < length) {
+                result.type = (ValueType)*((uint32_t *) (mText + pos));
+                pos += 4;
+                if (result.type == ValueType::String) {
+                    uint16_t valueLen = *((uint16_t *)(mText + pos));
+                    pos += 2;
+                    if (valueLen != 0) {
+                        for(int i = pos; i < pos + valueLen - 1; ++i) // chopping off terminating 0
+                            result.stringval += mText[i];
+                        pos += valueLen;
+                    }
+                }
+                if (result.type == ValueType::Int32) {
+                    result.i32val = *((uint32_t*)&mText[pos]);
+                    pos += 4;
                 }
             }
-            if (result.type == ValueType::Int32) {
-                result.i32val = *((uint32_t*)&mText[pos]);
-                pos += 4;
-            }
-
             return result;
         }
     private:
         const char * mText;
-        uint16_t mLength;
+        uint16_t length;
         uint16_t pos = 0;
     };
 }
@@ -84,19 +106,23 @@ bool TransferredFiles::findFile()
             if (*ptr == *ptr2) {
                 Package::PackageParser pp(p.payloadPointer(), p.payloadLength());
                 auto tag = pp.readValue();
-                if (tag.stringval != "FLST") {
+                if (tag != "FLST") {
                     ++current;
                     continue;
                 }
                 auto id = pp.readValue();
                 auto name = pp.readValue();
-                fileName = name.stringval;
+                fileName = (std::string)name;
                 auto size = pp.readValue();
+                fileSize = size;
                 auto date = pp.readValue();
+                fileDate = (std::string)date;
                 auto blocks = pp.readValue();
+                this->blocks = blocks;
                 auto bsize = pp.readValue();
+                this->bsize = bsize;
                 tag  = pp.readValue();
-                if (tag.stringval != "FLST") {
+                if (tag != "FLST") {
                     ++current;
                     continue;
                 }
@@ -112,6 +138,21 @@ bool TransferredFiles::findFile()
 std::string TransferredFiles::currentFileName() const
 {
     return fileName;
+}
+
+std::string TransferredFiles::currentFileDate() const
+{
+    return fileDate;
+}
+
+uint32_t TransferredFiles::currentFileSize() const
+{
+    return fileSize;
+}
+
+uint32_t TransferredFiles::currentFileId() const
+{
+    return fileId;
 }
 
 }
