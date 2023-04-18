@@ -16,6 +16,9 @@
 #include <string>
 #include <vector>
 #include <memory>
+extern "C" {
+#include "dlt_common.h"
+}
 
 namespace DLTFile {
 
@@ -115,11 +118,13 @@ public:
     bool parseHeaders(const DLTFileRecordRaw &record);
     void extractFileRecord(DLTFileRecordParsed & out);
 private:
-    struct Headers;
+    DltStorageHeader * storageHeader = nullptr;
+    DltStandardHeader * standardHeader = nullptr;
+    DltExtendedHeader * extendedHeader = nullptr;
+    DltStandardHeaderExtra headerExtra;
     uint32_t messageNumber;
     uint64_t offset;
     bool good;
-    Headers * headers;
     length_t payloadSize = 0;
     length_t headerSize = 0;
     char * payloadPtr;

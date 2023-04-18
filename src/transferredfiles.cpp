@@ -74,7 +74,7 @@ bool TransferredFiles::findFile()
     char flst[5] = {'F','L','S','T', '\0'};
     std::vector<char> Flst = {'F','L','S','T', '\0'};
     uint32_t * ptr = (uint32_t *)flst;
-    ++current;
+    //++current;
     while(current != end) {
         if ((*current).payloadSize > 10) {
             uint32_t * ptr2 = (uint32_t *)&(*current).payload.data[6];
