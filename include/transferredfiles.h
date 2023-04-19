@@ -16,8 +16,17 @@
 #include "dltrecordparser.h"
 #include "parsedrecordscollection.h"
 #include <string>
+#include <vector>
 
 namespace DLTFile {
+
+enum class FileTransferError {
+    NoError = 0,
+    BlockMismatch,
+    WrongSize,
+    ServerError,
+    WrongDLTFormat
+};
 
 class TransferredFiles
 {
@@ -29,7 +38,11 @@ public:
     uint32_t currentFileSize() const;
     uint32_t currentFileId() const;
     bool saveCurrentFile(const std::string & filename);
+    FileTransferError errorInCurrentFile();
+    bool endOfCurrentFile();
+     std::vector<char> getCurrentFileContents();
 private:
+    std::vector<char> readBlock();
     DLTFileRecordIterator current;
     DLTFileRecordIterator end;
     std::string fileName;
@@ -37,7 +50,10 @@ private:
     uint32_t blocks;
     uint32_t bsize;
     uint32_t fileId;
+    uint32_t bytesRead = 0;
+    bool eof = false;
     std::string fileDate;
+    FileTransferError error = FileTransferError::NoError;
 };
 
 }

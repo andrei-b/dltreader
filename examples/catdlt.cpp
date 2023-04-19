@@ -34,8 +34,11 @@ int main()
         //f.reset();
         DLTFile::ParsedRecordsCollection records(f);
         DLTFile::TransferredFiles files(f.begin(), f.end());
-        while (files.findFile())
+        while (files.findFile()) {
             printf("%s %i %s\n", files.currentFileName().data(), files.currentFileSize(), files.currentFileDate().data());
+            auto contents = files.getCurrentFileContents();
+            printf("%s\n", contents.data());
+        }
 
       /*  for(const DLTFile::DLTFileRecordParsed & record : records) {
             //printf("%i:%s\n", record.num, record.ecu.data);
