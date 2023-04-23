@@ -9,39 +9,5 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#include "indexer.h"
 
-namespace DLTFile {
 
-Indexer::Indexer(DLTFileParser &p) : parser(p)
-{
-
-}
-
-Index Indexer::makeIndex()
-{
-    Index result;
-    if (!parser.init()) {
-        return result;
-    }
-    for (const auto & r : parser)
-        result.push_back(r.offset);
-    return result;
-}
-
-SparceIndex Indexer::makeFilteredIndex(const std::vector<std::shared_ptr<DLTFilterBase> > &filters)
-{
-
-}
-
-SparceIndex Indexer::makeFilteredIndex(const DLTFilterBase &filter)
-{
-
-}
-
-SparceIndex Indexer::narrowIndex(const DLTFilterBase &filter, const SparceIndex &source)
-{
-
-}
-
-}

@@ -12,6 +12,7 @@
 #ifndef DLTFILEPARSER_H
 #define DLTFILEPARSER_H
 
+#include "parseddltrecord.h"
 #include <string>
 #include <vector>
 #include <iterator>
@@ -28,6 +29,7 @@ struct DLTFileRecordRaw
     length_t length = 0;
     char * msg = nullptr;
     bool operator == (const DLTFileRecordRaw & other) const;
+    ParsedDLTRecord parse();
 };
 
 using RecordCollection = std::vector<DLTFileRecordRaw>;

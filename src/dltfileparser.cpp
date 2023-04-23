@@ -9,6 +9,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+#include "dltrecordparser.h"
 #include "dltfileparser.h"
 #include "string.h"
 extern "C" {
@@ -214,6 +215,13 @@ DLTFileRecordIterator &DLTFileRecordIterator::operator ++()
 bool DLTFileRecordRaw::operator ==(const DLTFileRecordRaw &other) const
 {
     return this->num == other.num && this->offset == other.offset && this->good == other.good && this->length == other.length && this->msg == other.msg;
+}
+
+ParsedDLTRecord DLTFileRecordRaw::parse()
+{
+    DLTRecordParser p;
+    p.parseHeaders(*this);
+    return p.extractRecord();
 }
 
 }

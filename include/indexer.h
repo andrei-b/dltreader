@@ -12,32 +12,18 @@
 #ifndef INDEXER_H
 #define INDEXER_H
 #include "dltfileparser.h"
-#include "dltfilterbase.h"
 #include <memory>
 #include <vector>
 
 namespace DLTFile {
 
 using Index = std::vector<uint64_t>;
-struct SparceRecord
+struct SparceIndexRecord
 {
     uint64_t offset = 0;
     uint16_t length = 0;
 };
-using SparceIndex = std::vector<SparceRecord>;
-
-class Indexer
-{
-public:
-    explicit Indexer(DLTFileParser & p);
-    Index makeIndex();
-    SparceIndex makeFilteredIndex(const std::vector<std::shared_ptr<DLTFilterBase>> & filters);
-    SparceIndex makeFilteredIndex(const DLTFilterBase & filter);
-    SparceIndex narrowIndex(const DLTFilterBase & filter, const SparceIndex & source);
-private:
-    DLTFileParser & parser;
-};
+using SparceIndex = std::vector<SparceIndexRecord>;
 
 }
-
 #endif // INDEXER_H
