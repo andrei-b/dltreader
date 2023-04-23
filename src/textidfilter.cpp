@@ -9,23 +9,23 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#ifndef INDEXER_H
-#define INDEXER_H
-#include "dltfileparser.h"
-#include <memory>
-#include <vector>
+#include "textidfilter.h"
 
 namespace DLTFile {
 
-using Index = std::vector<uint64_t>;
-struct SparceIndexRecord
+TextIdFilter::TextIdFilter(const TextIdFilterSet & ctid, const TextIdFilterSet &apid, const TextIdFilterSet &ecu)
 {
-    uint64_t offset = 0;
-    uint16_t length = 0;
-};
-using SparceIndex = std::vector<SparceIndexRecord>;
-
-SparceIndex merge(const SparceIndex & index1, const SparceIndex & index2);
 
 }
-#endif // INDEXER_H
+
+bool TextIdFilter::match(const DLTFileRecordRaw &record)
+{
+
+}
+
+bool TextIdFilter::match(const RecordCollection &records)
+{
+
+}
+
+}
