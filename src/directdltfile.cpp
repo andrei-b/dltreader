@@ -20,6 +20,12 @@ DirectDLTFile::DirectDLTFile(const std::string &fileName) : DLTFileParser(fileNa
     buffer.reserve(BufferSize);
 }
 
+DirectDLTFile::DirectDLTFile(DirectDLTFile &&other) : DLTFileParser(std::move(other))
+{
+    mFile = std::move(other.mFile);
+    buffer = std::move(other.buffer);
+}
+
 DirectDLTFile::~DirectDLTFile()
 {
     closeFile();

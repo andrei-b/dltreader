@@ -48,6 +48,7 @@ class DLTFileParser
 public:
     explicit DLTFileParser(const std::string & fileName);
     DLTFileParser(DLTFileParser & other) = delete;
+    DLTFileParser(DLTFileParser && other);
     DLTFileParser & operator = (const DLTFileParser & other) = delete;
     virtual ~DLTFileParser();
     const std::string &fileName();
@@ -82,7 +83,7 @@ private:
 class DLTFileRecordIterator
 {
 public:
-    static constexpr uint32_t MaxRecordNum = 0xFFFF;
+    static constexpr uint32_t MaxRecordNum = 0xFFFFFFFF;
     explicit DLTFileRecordIterator(DLTFileParser & p, uint32_t recordNum = 0);
     typedef DLTFileRecordRaw value_type;
     typedef std::ptrdiff_t difference_type;

@@ -26,6 +26,10 @@ struct TextId {
     TextId()
     {
     }
+    TextId(const char * text)
+    {
+        *this = text;
+    }
     char data[5] = {'\0','\0','\0','\0','\0'};
     operator std::string(){
         return std::string(data, data+5);

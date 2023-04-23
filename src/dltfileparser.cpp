@@ -25,6 +25,31 @@ DLTFileParser::DLTFileParser(const std::string &fileName) : mFileName(fileName)
 
 }
 
+DLTFileParser::DLTFileParser(DLTFileParser &&other)
+{
+    buffer = other.buffer;
+    other.buffer = nullptr;
+    mFileName = other.mFileName;
+    endOfRecords = other.endOfRecords;
+    mRecordsCount = other.mRecordsCount;
+    currentMsgPosGlobal = other.currentMsgPosGlobal;
+    nextMsgPosGlobal = other.nextMsgPosGlobal;
+    bytesReadTotal = other.bytesReadTotal;
+    bytesRead = other.bytesRead;
+    currentMsgPosLocal = other.currentMsgPosLocal;
+    nextMsgPosLocal = other.nextMsgPosLocal;
+    localMsgOffset = other.localMsgOffset;
+    other.endOfRecords = true;
+    other.mRecordsCount = 0;
+    other.currentMsgPosGlobal = 0;
+    other.nextMsgPosGlobal = 0;
+    other.bytesReadTotal = 0;
+    other.bytesRead = 0;
+    other.currentMsgPosLocal = 0;
+    other.nextMsgPosLocal = 0;
+    other.localMsgOffset = 0;
+}
+
 DLTFileParser::~DLTFileParser()
 {
 }

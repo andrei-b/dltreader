@@ -22,7 +22,8 @@ using namespace std;
 
 int main()
 {
-        DLTFile::DirectDLTFile f("/home/andrei/Downloads/joinf.dlt");
+        DLTFile::DirectDLTFile f1("/home/andrei/Downloads/joinf.dlt");
+        DLTFile::DirectDLTFile f = std::move(f1);
         /*if (!f.init()) {
             printf("Init failed\n");
             return 0;

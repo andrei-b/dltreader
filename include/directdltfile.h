@@ -26,6 +26,7 @@ class DirectDLTFile : public DLTFileParser
 public:
     explicit DirectDLTFile(const std::string & fileName);
     DirectDLTFile(DirectDLTFile & other) = delete;
+    DirectDLTFile(DirectDLTFile && other);
     DirectDLTFile & operator = (const DirectDLTFile & other) = delete;
     virtual ~DirectDLTFile();
 protected:

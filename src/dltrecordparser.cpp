@@ -100,9 +100,7 @@ uint16_t DLTRecordParser::payloadLength()
 
 TextId DLTRecordParser::ecu() const
 {
-    TextId result;
-    result = headerExtra.ecu;
-    return result;
+    return headerExtra.ecu;
 }
 
 const char *DLTRecordParser::apid() const

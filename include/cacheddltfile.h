@@ -39,6 +39,7 @@ class CachedDLTFile : public DLTFileParser
 public:
     explicit CachedDLTFile(const std::string & fileName);
     CachedDLTFile(CachedDLTFile & other) = delete;
+    CachedDLTFile(CachedDLTFile && other) = delete;
     CachedDLTFile & operator = (const CachedDLTFile & other) = delete;
     virtual ~CachedDLTFile();
     bool eof() const;
