@@ -14,7 +14,6 @@
 #define TRANSFERREDFILES_H
 
 #include "dltrecordparser.h"
-#include "parsedrecordscollection.h"
 #include <string>
 #include <vector>
 

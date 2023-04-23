@@ -22,9 +22,14 @@ extern "C" {
 
 namespace DLTFile {
 
-DLTFileRecordRaw & parseFileRecordHeaders(DLTFileRecordRaw & record);
-
 struct TextId {
+    TextId(TextId & other)
+    {
+        *this = other;
+    }
+    TextId()
+    {
+    }
     char data[5] = {'\0','\0','\0','\0','\0'};
     operator std::string(){
         return std::string(data, data+5);
@@ -54,7 +59,9 @@ struct TextId {
     }
     bool operator ==(const char * other) const
     {
-        return data[0] == other[0] && data[1] == other[1] && data[2] == other[2] && data[3] == other[3];
+        if (other != nullptr)
+            return data[0] == other[0] && data[1] == other[1] && data[2] == other[2] && data[3] == other[3];
+        return false;
     }
     bool operator ==(const std::string & other) const
     {
@@ -80,18 +87,8 @@ enum class DLTLogMode {
     NonVerbose
 };
 
-struct Payload {
-    void set(const char * src, uint16_t length)
-    {
-       data.reset(new char[length]);
-       len = length;
-       std::copy(src, src+length, data.get());
-    }
-    std::shared_ptr<char[]> data;
-    uint16_t len;
-};
 
-struct DLTFileRecordParsed
+struct ParsedDLTRecord
 {
     uint32_t num = 0;
     uint64_t offset = 0;
@@ -106,15 +103,14 @@ struct DLTFileRecordParsed
     uint32_t seconds = 0;
     uint32_t microseconds = 0;
     uint32_t timestamp = 0;
-    uint32_t payloadSize;
+    uint16_t payloadSize;
     void set(const char * src, uint16_t length)
     {
        data.reset(new char[length]);
-       len = length;
-       std::copy(src, src+length, data.get());
+       payloadSize = length;
+       std::copy(src, src+payloadSize, data.get());
     }
     std::shared_ptr<char[]> data;
-    uint16_t len;
 };
 
 class DLTRecordParser
@@ -125,7 +121,10 @@ public:
     bool parseHeaders(const DLTFileRecordRaw &record);
     char * payloadPointer();
     uint16_t payloadLength();
-    DLTFileRecordParsed extractRecord();
+    TextId ecu() const;
+    const char * apid() const;
+    const char * ctid() const;
+    ParsedDLTRecord extractRecord();
 private:
     DltStorageHeader * storageHeader = nullptr;
     DltStandardHeader * standardHeader = nullptr;

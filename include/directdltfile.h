@@ -25,6 +25,8 @@ class DirectDLTFile : public DLTFileParser
     static const uint64_t BufferSize = 4096*1024; // this should be greater than the maximum size of the dlt message (64k).
 public:
     explicit DirectDLTFile(const std::string & fileName);
+    DirectDLTFile(DirectDLTFile & other) = delete;
+    DirectDLTFile & operator = (const DirectDLTFile & other) = delete;
     virtual ~DirectDLTFile();
 protected:
     bool resetFile() override;

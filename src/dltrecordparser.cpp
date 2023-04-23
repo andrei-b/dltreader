@@ -98,10 +98,32 @@ uint16_t DLTRecordParser::payloadLength()
     return payloadSize;
 }
 
-DLTFileRecordParsed DLTRecordParser::extractRecord()
+TextId DLTRecordParser::ecu() const
 {
+    TextId result;
+    result = headerExtra.ecu;
+    return result;
+}
 
-    DLTFileRecordParsed out;
+const char *DLTRecordParser::apid() const
+{
+    if (DLT_IS_HTYP_UEH(standardHeader->htyp))
+        if (extendedHeader->apid[0] != 0)
+            return extendedHeader->apid;
+    return nullptr;
+}
+
+const char *DLTRecordParser::ctid() const
+{
+    if (DLT_IS_HTYP_UEH(standardHeader->htyp))
+        if (extendedHeader->ctid[0] != 0)
+            return extendedHeader->ctid;
+    return nullptr;
+}
+
+ParsedDLTRecord DLTRecordParser::extractRecord()
+{
+    ParsedDLTRecord out;
     out.num = messageNumber;
     out.offset = offset;
     out.good = good;
@@ -145,10 +167,5 @@ DLTFileRecordParsed DLTRecordParser::extractRecord()
 }
 
 
-
-DLTFileRecordRaw &parseFileRecordHeaders(DLTFileRecordRaw &record)
-{
-
-}
 
 }

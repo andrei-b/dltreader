@@ -9,7 +9,6 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#include "parsedrecordscollection.h"
 #include "cacheddltfile.h"
 #include "directdltfile.h"
 #include "indexer.h"
@@ -32,7 +31,6 @@ int main()
         //auto index = idx.makeIndex();
         //printf ("index: %i\n", index.size());
         //f.reset();
-        DLTFile::ParsedRecordsCollection records(f);
         DLTFile::TransferredFiles files(f.begin(), f.end());
         while (files.findFile()) {
             printf("%s %i %s\n", files.currentFileName().data(), files.currentFileSize(), files.currentFileDate().data());
