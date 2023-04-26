@@ -29,7 +29,7 @@ public:
         while (begin != end) {
             const DLTFileRecordRaw & r = *begin;
             if (match(r))
-                result.push_back({r.offset, r.length});
+                result.records.push_back({r.offset, r.length});
             ++begin;
         }
         return result;

@@ -28,6 +28,7 @@ public:
     DirectDLTFile(DirectDLTFile & other) = delete;
     DirectDLTFile(DirectDLTFile && other);
     DirectDLTFile & operator = (const DirectDLTFile & other) = delete;
+    DirectDLTFile & operator = (const DirectDLTFile && other) = delete;
     virtual ~DirectDLTFile();
 protected:
     bool resetFile() override;

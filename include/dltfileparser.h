@@ -47,9 +47,10 @@ class DLTFileParser
 {
 public:
     explicit DLTFileParser(const std::string & fileName);
-    DLTFileParser(DLTFileParser & other) = delete;
+    DLTFileParser(const DLTFileParser & other) = delete;
     DLTFileParser(DLTFileParser && other);
     DLTFileParser & operator = (const DLTFileParser & other) = delete;
+    DLTFileParser & operator = (const DLTFileParser && other) = delete;
     virtual ~DLTFileParser();
     const std::string &fileName();
     virtual bool init();

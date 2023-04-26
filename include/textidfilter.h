@@ -19,19 +19,17 @@
 namespace DLTFile
 {
 
-struct TextIdFilterSet
-{
-    bool IncludeFilter = true;
-    std::vector<TextId> ids;
-};
+ using TextIdFilterSet = std::vector<TextId>;
+
 
 class TextIdFilter: public DLTFilterBase
 {
 public:
-    explicit TextIdFilter(const TextIdFilterSet &ctid, const TextIdFilterSet &apid = TextIdFilterSet, const TextIdFilterSet &ecu = TextIdFilterSet);
+    explicit TextIdFilter(bool includeFilter, TextIdFilterSet ctid, TextIdFilterSet apid = TextIdFilterSet(), TextIdFilterSet ecu = TextIdFilterSet());
     bool virtual match(const DLTFileRecordRaw & record) override;
     bool virtual match(const RecordCollection & records) override;
 private:
+    bool includeFilter = true;
     TextIdFilterSet ctid;
     TextIdFilterSet apid;
     TextIdFilterSet ecu;

@@ -41,6 +41,7 @@ public:
     CachedDLTFile(CachedDLTFile & other) = delete;
     CachedDLTFile(CachedDLTFile && other) = delete;
     CachedDLTFile & operator = (const CachedDLTFile & other) = delete;
+    CachedDLTFile & operator = (const CachedDLTFile && other) = delete;
     virtual ~CachedDLTFile();
     bool eof() const;
     bool init() override;

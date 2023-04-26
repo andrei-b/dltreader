@@ -10,17 +10,35 @@
 */
 
 #include "textidfilter.h"
+#include "dltrecordparser.h"
 
 namespace DLTFile {
 
-TextIdFilter::TextIdFilter(const TextIdFilterSet & ctid, const TextIdFilterSet &apid, const TextIdFilterSet &ecu)
+TextIdFilter::TextIdFilter(bool includeFilter, TextIdFilterSet ctid, TextIdFilterSet apid, TextIdFilterSet ecu) : includeFilter(includeFilter), ctid(ctid.begin(), ctid.end()), apid(apid.begin(), apid.end()), ecu(ecu.begin(), ecu.end())
 {
 
 }
 
 bool TextIdFilter::match(const DLTFileRecordRaw &record)
 {
-
+    DLTRecordParser rp;
+    rp.parseHeaders(record);
+    for (const auto & id : ctid) {
+        if (id == rp.ctid()) {
+            return includeFilter;
+        }
+    }
+    for (const auto & id : apid) {
+        if (id == rp.apid()) {
+            return includeFilter;
+        }
+    }
+    for (const auto & id : ecu) {
+        if (id == rp.ecu()) {
+            return includeFilter;
+        }
+    }
+    return !includeFilter;
 }
 
 bool TextIdFilter::match(const RecordCollection &records)

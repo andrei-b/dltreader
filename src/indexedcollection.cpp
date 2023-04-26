@@ -9,35 +9,9 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#ifndef INDEXER_H
-#define INDEXER_H
-#include "dltfileparser.h"
-#include <memory>
-#include <vector>
-#include <string>
+#include "indexedcollection.h"
 
-namespace DLTFile {
-
-struct Index
+IndexedCollection::IndexedCollection()
 {
-    std::string fileName;
-    std::vector<uint64_t> offsets;
-};
-
-struct SparceIndexRecord
-{
-    uint64_t offset = 0;
-    uint16_t length = 0;
-};
-
-struct SparceIndex
-{
-    std::string fileName;
-    std::vector<SparceIndexRecord> records;
-};
-
-
-SparceIndex merge(const SparceIndex & index1, const SparceIndex & index2);
 
 }
-#endif // INDEXER_H
