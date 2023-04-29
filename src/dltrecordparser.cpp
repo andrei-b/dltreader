@@ -103,6 +103,11 @@ TextId DLTRecordParser::ecu() const
     return headerExtra.ecu;
 }
 
+const char *DLTRecordParser::ecuPtr() const
+{
+    return headerExtra.ecu;
+}
+
 const char *DLTRecordParser::apid() const
 {
     if (DLT_IS_HTYP_UEH(standardHeader->htyp))

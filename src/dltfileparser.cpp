@@ -231,7 +231,7 @@ DLTFileRecordIterator &DLTFileRecordIterator::operator ++()
         while (state == ParserState::NeedMoreData)
             state = parser.parse(record);
         if (state != ParserState::HaveRecord) {
-            record = {MaxRecordNum,0,true,0,nullptr};
+            record = {MaxRecordNum,0,true,0,nullptr, false};
         }
     }
     return *this;
@@ -240,6 +240,18 @@ DLTFileRecordIterator &DLTFileRecordIterator::operator ++()
 bool DLTFileRecord::operator ==(const DLTFileRecord &other) const
 {
     return this->num == other.num && this->offset == other.offset && this->good == other.good && this->length == other.length && this->msg == other.msg;
+}
+
+void DLTFileRecord::lightParse()
+{
+    DLTRecordParser p;
+    p.parseHeaders(*this);
+    apid = p.apid();
+    ctid = p.ctid();
+    ecu = p.ecuPtr();
+    payload = p.payloadPointer();
+    payloadLength = p.payloadLength();
+    headerParsed = true;
 }
 
 ParsedDLTRecord DLTFileRecord::parse()

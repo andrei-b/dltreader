@@ -20,21 +20,9 @@ namespace DLTReader {
 class DLTFilterBase
 {
 public:
-    bool virtual match(const DLTFileRecord & record) = 0;
+    bool virtual match(DLTFileRecord & record) = 0;
     bool virtual match(const RecordCollection & records) = 0;
-    template<typename T>
-    SparceIndex apply(T begin, T end)
-    {
-        SparceIndex result;
-        while (begin != end) {
-            const DLTFileRecord & r = *begin;
-            if (match(r))
-                result.records.push_back({r.offset, r.length});
-            ++begin;
-        }
-        return result;
-    }
-};
+ };
 
 }
 

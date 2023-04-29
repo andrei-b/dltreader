@@ -14,34 +14,68 @@
 
 namespace DLTReader {
 
-TextIdFilter::TextIdFilter(bool includeFilter, TextIdSet ctid, TextIdSet apid, TextIdSet ecu) : includeFilter(includeFilter), ctid(ctid.begin(), ctid.end()), apid(apid.begin(), apid.end()), ecu(ecu.begin(), ecu.end())
+ApIdFilter::ApIdFilter(bool positive, TextIdSet &&set) : positive(positive), set(std::move(set))
 {
 
 }
 
-bool TextIdFilter::match(const DLTFileRecord &record)
+bool ApIdFilter::match(DLTFileRecord &record)
 {
-    DLTRecordParser rp;
-    rp.parseHeaders(record);
-    for (const auto & id : ctid) {
-        if (id == rp.ctid()) {
-            return includeFilter;
+    if (!record.headerParsed)
+        record.lightParse();
+    for (const auto & id : set) {
+        if (id == record.apid) {
+            return positive;
         }
     }
-    for (const auto & id : apid) {
-        if (id == rp.apid()) {
-            return includeFilter;
-        }
-    }
-    for (const auto & id : ecu) {
-        if (id == rp.ecu()) {
-            return includeFilter;
-        }
-    }
-    return !includeFilter;
+    return !positive;
 }
 
-bool TextIdFilter::match(const RecordCollection &records)
+bool ApIdFilter::match(const RecordCollection &records)
+{
+
+}
+
+CtIdFilter::CtIdFilter(bool positive, TextIdSet &&set) : positive(positive), set(std::move(set))
+{
+
+}
+
+bool CtIdFilter::match(DLTFileRecord &record)
+{
+    if (!record.headerParsed)
+        record.lightParse();
+    for (const auto & id : set) {
+        if (id == record.ctid) {
+            return positive;
+        }
+    }
+    return !positive;
+}
+
+bool CtIdFilter::match(const RecordCollection &records)
+{
+
+}
+
+EcuFilter::EcuFilter(bool positive, TextIdSet &&set) : positive(positive), set(std::move(set))
+{
+
+}
+
+bool EcuFilter::match(DLTFileRecord &record)
+{
+    if (!record.headerParsed)
+        record.lightParse();
+    for (const auto & id : set) {
+        if (id == record.ecu) {
+            return positive;
+        }
+    }
+    return !positive;
+}
+
+bool EcuFilter::match(const RecordCollection &records)
 {
 
 }

@@ -22,17 +22,37 @@ namespace DLTReader
  using TextIdSet = std::vector<TextId>;
 
 
-class TextIdFilter: public DLTFilterBase
+class ApIdFilter: public DLTFilterBase
 {
 public:
-    explicit TextIdFilter(bool includeFilter, TextIdSet ctid, TextIdSet apid = TextIdSet(), TextIdSet ecu = TextIdSet());
-    bool virtual match(const DLTFileRecord & record) override;
+    ApIdFilter(bool positive, TextIdSet && set);
+    bool virtual match(DLTFileRecord &record) override;
     bool virtual match(const RecordCollection & records) override;
 private:
-    bool includeFilter = true;
-    TextIdSet ctid;
-    TextIdSet apid;
-    TextIdSet ecu;
+    bool positive = true;
+    TextIdSet set;
+};
+
+class CtIdFilter: public DLTFilterBase
+{
+public:
+    CtIdFilter(bool positive, TextIdSet && set);
+    bool virtual match(DLTFileRecord &record) override;
+    bool virtual match(const RecordCollection & records) override;
+private:
+    bool positive = true;
+    TextIdSet set;
+};
+
+class EcuFilter: public DLTFilterBase
+{
+public:
+    EcuFilter(bool positive, TextIdSet && set);
+    bool virtual match(DLTFileRecord &record) override;
+    bool virtual match(const RecordCollection & records) override;
+private:
+    bool positive = true;
+    TextIdSet set;
 };
 
 }

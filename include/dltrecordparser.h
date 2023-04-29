@@ -34,6 +34,7 @@ public:
     char * payloadPointer();
     uint16_t payloadLength();
     TextId ecu() const;
+    const char *ecuPtr() const;
     const char * apid() const;
     const char * ctid() const;
     ParsedDLTRecord extractRecord();
