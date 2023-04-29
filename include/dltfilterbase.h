@@ -15,25 +15,13 @@
 #include "dltfileparser.h"
 #include "indexer.h"
 
-namespace DLTFile {
+namespace DLTReader {
 
 class DLTFilterBase
 {
 public:
     bool virtual match(const DLTFileRecordRaw & record) = 0;
     bool virtual match(const RecordCollection & records) = 0;
-    template<typename T>
-    SparceIndex apply(T begin, T end)
-    {
-        SparceIndex result;
-        while (begin != end) {
-            const DLTFileRecordRaw & r = *begin;
-            if (match(r))
-                result.records.push_back({r.offset, r.length});
-            ++begin;
-        }
-        return result;
-    }
 };
 
 }

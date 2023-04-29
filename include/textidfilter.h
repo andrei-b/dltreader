@@ -14,25 +14,41 @@
 
 #include "dltfilterbase.h"
 #include "parseddltrecord.h"
+#include "parseddltrecord.h"
+#include "dltrecordparser.h"
 #include <vector>
 
-namespace DLTFile
+namespace DLTReader
 {
 
- using TextIdFilterSet = std::vector<TextId>;
+using TextIdSet = std::vector<TextId>;
 
 
+enum class TextIDField
+{
+    ApId = 0,
+    CtId,
+    Ecu
+};
+
+template<enum TextIDField F>
 class TextIdFilter: public DLTFilterBase
 {
 public:
-    explicit TextIdFilter(bool includeFilter, TextIdFilterSet ctid, TextIdFilterSet apid = TextIdFilterSet(), TextIdFilterSet ecu = TextIdFilterSet());
+    template <TextIDField f = F, std::enable_if_t<(f == TextIDField::CtId)>* = nullptr>
+    TextIdFilter(bool positiveFilter, TextIdSet set);
+
+    template <TextIDField f = F, std::enable_if_t<(f == TextIDField::ApId)>* = nullptr>
+    bool matchInternal(const DLTFileRecordRaw & record);
+
+    template <TextIDField f = F, std::enable_if_t<(f == TextIDField::CtId)>* = nullptr>
+    bool matchInternal(const DLTFileRecordRaw & record);
+
     bool virtual match(const DLTFileRecordRaw & record) override;
     bool virtual match(const RecordCollection & records) override;
 private:
-    bool includeFilter = true;
-    TextIdFilterSet ctid;
-    TextIdFilterSet apid;
-    TextIdFilterSet ecu;
+    bool positiveFilter = true;
+    TextIdSet set;
 };
 
 }

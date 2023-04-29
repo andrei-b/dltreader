@@ -15,11 +15,11 @@
 #include <string>
 #include <memory>
 
-namespace DLTFile
+namespace DLTReader
 {
 
 struct TextId {
-    TextId(TextId & other)
+    TextId(const TextId & other)
     {
         *this = other;
     }

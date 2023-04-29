@@ -20,7 +20,7 @@
 #include<iostream>
 #include<fstream>
 
-namespace DLTFile {
+namespace DLTReader {
 
 class CachedDLTFile : public DLTFileParser
 {

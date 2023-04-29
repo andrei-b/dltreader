@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <stdio.h>
 
-namespace DLTFile {
+namespace DLTReader {
 
 DirectDLTFile::DirectDLTFile(const std::string &fileName) : DLTFileParser(fileName)
 {

@@ -11,7 +11,7 @@
 
 #include "indexer.h"
 
-namespace DLTFile {
+namespace DLTReader {
 
 SparceIndex merge(const SparceIndex &index1, const SparceIndex &index2)
 {

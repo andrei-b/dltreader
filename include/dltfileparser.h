@@ -17,7 +17,7 @@
 #include <vector>
 #include <iterator>
 
-namespace DLTFile {
+namespace DLTReader {
 
 using length_t = uint16_t;
 

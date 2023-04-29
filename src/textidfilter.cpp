@@ -12,38 +12,48 @@
 #include "textidfilter.h"
 #include "dltrecordparser.h"
 
-namespace DLTFile {
+namespace DLTReader {
 
-TextIdFilter::TextIdFilter(bool includeFilter, TextIdFilterSet ctid, TextIdFilterSet apid, TextIdFilterSet ecu) : includeFilter(includeFilter), ctid(ctid.begin(), ctid.end()), apid(apid.begin(), apid.end()), ecu(ecu.begin(), ecu.end())
+template<enum TextIDField F>
+template <TextIDField f, std::enable_if_t<(f == TextIDField::CtId)>*>
+TextIdFilter<F>::TextIdFilter(bool positiveFilter, TextIdSet set) : positiveFilter(positiveFilter), set(set)
 {
 
 }
 
-bool TextIdFilter::match(const DLTFileRecordRaw &record)
+template<TextIDField F>
+template <TextIDField f, std::enable_if_t<(f == TextIDField::ApId)>*>
+bool TextIdFilter<F>::matchInternal(const DLTFileRecordRaw & record)
 {
     DLTRecordParser rp;
     rp.parseHeaders(record);
-    for (const auto & id : ctid) {
-        if (id == rp.ctid()) {
-            return includeFilter;
-        }
-    }
-    for (const auto & id : apid) {
+    for (const auto & id : set) {
         if (id == rp.apid()) {
-            return includeFilter;
+            return positiveFilter;
         }
     }
-    for (const auto & id : ecu) {
-        if (id == rp.ecu()) {
-            return includeFilter;
-        }
-    }
-    return !includeFilter;
 }
 
-bool TextIdFilter::match(const RecordCollection &records)
+template<TextIDField F>
+template <TextIDField f, std::enable_if_t<(f == TextIDField::CtId)>*>
+bool TextIdFilter<F>::matchInternal(const DLTFileRecordRaw & record)
 {
-
+    DLTRecordParser rp;
+    rp.parseHeaders(record);
+    for (const auto & id : set) {
+        if (id == rp.ctid()) {
+            return positiveFilter;
+        }
+    }
 }
+
+
+template<TextIDField F>
+bool TextIdFilter<F>::match(const DLTFileRecordRaw &record)
+{
+    return matchInternal<F>(record);
+}
+
+
 
 }

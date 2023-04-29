@@ -16,7 +16,7 @@ extern "C" {
 #include "dlt_common.h"
 }
 
-namespace DLTFile {
+namespace DLTReader {
 
 const int32_t TotalHeaderSize = sizeof(DltStorageHeader) + sizeof(DltStandardHeader);
 
