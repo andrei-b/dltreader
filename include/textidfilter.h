@@ -26,7 +26,7 @@ class TextIdFilter: public DLTFilterBase
 {
 public:
     explicit TextIdFilter(bool includeFilter, TextIdSet ctid, TextIdSet apid = TextIdSet(), TextIdSet ecu = TextIdSet());
-    bool virtual match(const DLTFileRecordRaw & record) override;
+    bool virtual match(const DLTFileRecord & record) override;
     bool virtual match(const RecordCollection & records) override;
 private:
     bool includeFilter = true;

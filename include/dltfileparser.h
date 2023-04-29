@@ -21,18 +21,23 @@ namespace DLTReader {
 
 using length_t = uint16_t;
 
-struct DLTFileRecordRaw
+struct DLTFileRecord
 {
     uint32_t num = 0;
     uint64_t offset = 0;
     bool good = true;
     length_t length = 0;
     char * msg = nullptr;
-    bool operator == (const DLTFileRecordRaw & other) const;
+    bool headerParsed = false;
+    char * ctid;
+    char * apid;
+    char * ecu;
+    char * payload;
+    bool operator == (const DLTFileRecord & other) const;
     ParsedDLTRecord parse();
 };
 
-using RecordCollection = std::vector<DLTFileRecordRaw>;
+using RecordCollection = std::vector<DLTFileRecord>;
 using BufPtr = char*;
 
 enum class ParserState {
@@ -55,7 +60,7 @@ public:
     const std::string &fileName();
     virtual bool init();
     virtual void reset();
-    ParserState parse(DLTFileRecordRaw & record);
+    ParserState parse(DLTFileRecord & record);
     ParserState parseBatch(RecordCollection & records);
     int32_t recordsCount();
     DLTFileRecordIterator begin();
@@ -77,7 +82,7 @@ private:
     uint32_t nextMsgPosLocal = 0;
     uint64_t localMsgOffset = 0;
     BufPtr buffer = nullptr;
-    ParserState processLastRecord(DLTFileRecordRaw & record);
+    ParserState processLastRecord(DLTFileRecord & record);
     bool nextCallWillRead();
 };
 
@@ -86,19 +91,19 @@ class DLTFileRecordIterator
 public:
     static constexpr uint32_t MaxRecordNum = 0xFFFFFFFF;
     explicit DLTFileRecordIterator(DLTFileParser & p, uint32_t recordNum = 0);
-    typedef DLTFileRecordRaw value_type;
+    typedef DLTFileRecord value_type;
     typedef std::ptrdiff_t difference_type;
-    typedef DLTFileRecordRaw * pointer;
-    typedef DLTFileRecordRaw & reference;
+    typedef DLTFileRecord * pointer;
+    typedef DLTFileRecord & reference;
     typedef std::input_iterator_tag iterator_category;
-    DLTFileRecordRaw operator * () const;
+    DLTFileRecord operator * () const;
     bool operator ==(const DLTFileRecordIterator & other) const;
     bool operator !=(const DLTFileRecordIterator & other) const;
     DLTFileRecordIterator & operator ++ ();
     static DLTFileRecordIterator makeEndIterator(DLTFileParser & p);
 private:
     DLTFileParser & parser;
-    DLTFileRecordRaw record;
+    DLTFileRecord record;
 };
 
 }

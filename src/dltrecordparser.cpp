@@ -13,7 +13,7 @@
 
 
 
-namespace DLTFile {
+namespace DLTReader {
 
 
 
@@ -30,7 +30,7 @@ const uint16_t StorageHeaderSize = sizeof(DltStorageHeader);
 const uint16_t StandardHeaderSize = sizeof(DltStandardHeader);
 const uint16_t ExtendedHeaderSize = sizeof(DltExtendedHeader);
 
-bool DLTRecordParser::parseHeaders(const DLTFileRecordRaw &record)
+bool DLTRecordParser::parseHeaders(const DLTFileRecord &record)
 {
     messageNumber = record.num;
     offset = record.offset;

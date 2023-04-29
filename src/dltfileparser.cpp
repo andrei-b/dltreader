@@ -16,7 +16,7 @@ extern "C" {
 #include "dlt_common.h"
 }
 
-namespace DLTFile {
+namespace DLTReader {
 
 const int32_t TotalHeaderSize = sizeof(DltStorageHeader) + sizeof(DltStandardHeader);
 
@@ -93,7 +93,7 @@ int32_t sstrstr(char *haystack, char *needle, size_t begin, size_t length)
     return -1;
 }
 
-ParserState DLTFileParser::parse(DLTFileRecordRaw &record)
+ParserState DLTFileParser::parse(DLTFileRecord &record)
 {
     if (endOfRecords)
         return ParserState::EndOfFile;
@@ -143,7 +143,7 @@ ParserState DLTFileParser::parse(DLTFileRecordRaw &record)
         }
         DltStandardHeader * hdr = (DltStandardHeader *) &buffer[nextMsgPosLocal+sizeof(DltStorageHeader)];
         length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
-        record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0};
+        record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
         if (nextMsgPosLocal < bytesRead && bytesRead - nextMsgPosLocal <= TotalHeaderSize) {
                 bytesReadTotal -= TotalHeaderSize;
                 seek(bytesReadTotal);
@@ -155,7 +155,7 @@ ParserState DLTFileParser::parse(DLTFileRecordRaw &record)
 
 ParserState DLTFileParser::parseBatch(RecordCollection &records)
 {
-    DLTFileRecordRaw r;
+    DLTFileRecord r;
     auto state = parse(r);
     while (state == ParserState::HaveRecord && !nextCallWillRead()) {
         records.push_back(r);
@@ -181,14 +181,14 @@ DLTFileRecordIterator DLTFileParser::end()
     return DLTFileRecordIterator(*this, DLTFileRecordIterator::MaxRecordNum);
 }
 
-ParserState DLTFileParser::processLastRecord(DLTFileRecordRaw &record)
+ParserState DLTFileParser::processLastRecord(DLTFileRecord &record)
 {
     auto hdr0 = (DltStorageHeader *) &buffer[nextMsgPosLocal];
     if (sstrstr((char*)hdr0->pattern, (char*)"DLT\1", 0, 4) != 0) {
         DltStandardHeader * hdr = (DltStandardHeader *) &buffer[nextMsgPosLocal+sizeof(DltStorageHeader)];
         length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
         mRecordsCount++;
-        record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0};
+        record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
         endOfRecords = true;
         return ParserState::HaveRecord;
     }
@@ -209,7 +209,7 @@ DLTFileRecordIterator::DLTFileRecordIterator(DLTFileParser &p, uint32_t recordNu
         record.num = recordNum;
 }
 
-DLTFileRecordRaw DLTFileRecordIterator::operator *() const
+DLTFileRecord DLTFileRecordIterator::operator *() const
 {
     return record;
 }
@@ -237,12 +237,12 @@ DLTFileRecordIterator &DLTFileRecordIterator::operator ++()
     return *this;
 }
 
-bool DLTFileRecordRaw::operator ==(const DLTFileRecordRaw &other) const
+bool DLTFileRecord::operator ==(const DLTFileRecord &other) const
 {
     return this->num == other.num && this->offset == other.offset && this->good == other.good && this->length == other.length && this->msg == other.msg;
 }
 
-ParsedDLTRecord DLTFileRecordRaw::parse()
+ParsedDLTRecord DLTFileRecord::parse()
 {
     DLTRecordParser p;
     p.parseHeaders(*this);

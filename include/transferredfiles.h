@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace DLTFile {
+namespace DLTReader {
 
 enum class FileTransferError {
     NoError = 0,

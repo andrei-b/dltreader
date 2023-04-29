@@ -14,7 +14,7 @@
 #include <thread>
 #include <stdio.h>
 
-namespace DLTFile {
+namespace DLTReader {
 
 CachedDLTFile::CachedDLTFile(const std::string &fileName) : DLTFileParser(fileName)
 {

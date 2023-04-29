@@ -19,7 +19,7 @@ TextIdFilter::TextIdFilter(bool includeFilter, TextIdSet ctid, TextIdSet apid, T
 
 }
 
-bool TextIdFilter::match(const DLTFileRecordRaw &record)
+bool TextIdFilter::match(const DLTFileRecord &record)
 {
     DLTRecordParser rp;
     rp.parseHeaders(record);

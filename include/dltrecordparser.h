@@ -30,7 +30,7 @@ class DLTRecordParser
 public:
     DLTRecordParser();
     ~DLTRecordParser();
-    bool parseHeaders(const DLTFileRecordRaw &record);
+    bool parseHeaders(const DLTFileRecord &record);
     char * payloadPointer();
     uint16_t payloadLength();
     TextId ecu() const;

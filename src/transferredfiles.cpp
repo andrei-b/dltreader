@@ -15,7 +15,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace DLTFile {
+namespace DLTReader {
 
 namespace Package {
 

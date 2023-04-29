@@ -18,7 +18,7 @@
 #include<iostream>
 #include<fstream>
 
-namespace DLTFile {
+namespace DLTReader {
 
 class DirectDLTFile : public DLTFileParser
 {
