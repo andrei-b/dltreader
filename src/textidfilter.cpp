@@ -12,9 +12,9 @@
 #include "textidfilter.h"
 #include "dltrecordparser.h"
 
-namespace DLTFile {
+namespace DLTReader {
 
-TextIdFilter::TextIdFilter(bool includeFilter, TextIdFilterSet ctid, TextIdFilterSet apid, TextIdFilterSet ecu) : includeFilter(includeFilter), ctid(ctid.begin(), ctid.end()), apid(apid.begin(), apid.end()), ecu(ecu.begin(), ecu.end())
+TextIdFilter::TextIdFilter(bool includeFilter, TextIdSet ctid, TextIdSet apid, TextIdSet ecu) : includeFilter(includeFilter), ctid(ctid.begin(), ctid.end()), apid(apid.begin(), apid.end()), ecu(ecu.begin(), ecu.end())
 {
 
 }

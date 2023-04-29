@@ -21,7 +21,7 @@ extern "C" {
 #include "dlt_common.h"
 }
 
-namespace DLTFile {
+namespace DLTReader {
 
 
 

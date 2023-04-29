@@ -16,7 +16,7 @@
 #include <vector>
 #include <string>
 
-namespace DLTFile {
+namespace DLTReader {
 
 struct Index
 {

@@ -15,7 +15,7 @@
 #include <string>
 #include <memory>
 
-namespace DLTFile
+namespace DLTReader
 {
 
 struct TextId {

@@ -16,23 +16,23 @@
 #include "parseddltrecord.h"
 #include <vector>
 
-namespace DLTFile
+namespace DLTReader
 {
 
- using TextIdFilterSet = std::vector<TextId>;
+ using TextIdSet = std::vector<TextId>;
 
 
 class TextIdFilter: public DLTFilterBase
 {
 public:
-    explicit TextIdFilter(bool includeFilter, TextIdFilterSet ctid, TextIdFilterSet apid = TextIdFilterSet(), TextIdFilterSet ecu = TextIdFilterSet());
+    explicit TextIdFilter(bool includeFilter, TextIdSet ctid, TextIdSet apid = TextIdSet(), TextIdSet ecu = TextIdSet());
     bool virtual match(const DLTFileRecordRaw & record) override;
     bool virtual match(const RecordCollection & records) override;
 private:
     bool includeFilter = true;
-    TextIdFilterSet ctid;
-    TextIdFilterSet apid;
-    TextIdFilterSet ecu;
+    TextIdSet ctid;
+    TextIdSet apid;
+    TextIdSet ecu;
 };
 
 }

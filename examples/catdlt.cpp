@@ -22,8 +22,8 @@ using namespace std;
 
 int main()
 {
-        DLTFile::DirectDLTFile f1("/home/andrei/Downloads/joinf.dlt");
-        DLTFile::DirectDLTFile f = std::move(f1);
+        DLTReader::DirectDLTFile f1("/home/andrei/Downloads/joinf.dlt");
+        DLTReader::DirectDLTFile f = std::move(f1);
         /*if (!f.init()) {
             printf("Init failed\n");
             return 0;
@@ -32,7 +32,7 @@ int main()
         //auto index = idx.makeIndex();
         //printf ("index: %i\n", index.size());
         //f.reset();
-        DLTFile::TransferredFiles files(f.begin(), f.end());
+        DLTReader::TransferredFiles files(f.begin(), f.end());
         while (files.findFile()) {
             printf("%s %i %s\n", files.currentFileName().data(), files.currentFileSize(), files.currentFileDate().data());
             auto contents = files.getCurrentFileContents();

@@ -15,7 +15,7 @@
 #include "dltfileparser.h"
 #include "indexer.h"
 
-namespace DLTFile {
+namespace DLTReader {
 
 class DLTFilterBase
 {
