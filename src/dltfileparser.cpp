@@ -153,7 +153,7 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
     return ParserState::Error;
 }
 
-ParserState DLTFileParser::parseBatch(RecordCollection &records)
+ParserState DLTFileParser::parseBatch(DLTRecordSet &records)
 {
     DLTFileRecord r;
     auto state = parse(r);

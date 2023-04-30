@@ -9,14 +9,24 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#ifndef INDEXEDCOLLECTION_H
-#define INDEXEDCOLLECTION_H
+#include "dltrecordcollection.h"
+
+namespace DLTReader {
 
 
-class IndexedCollection
+DLTRecordCollection::DLTRecordCollection(DLTFileParser &source, const DLTFilterBase &filter)
 {
-public:
-    IndexedCollection();
-};
 
-#endif // INDEXEDCOLLECTION_H
+}
+
+DLTRecordCollection::DLTRecordCollection(DLTFileParser & source)
+{
+
+}
+
+DLTRecordCollection::DLTRecordCollection(DLTRecordCollection &source, const DLTFilterBase &filter)
+{
+
+}
+
+}

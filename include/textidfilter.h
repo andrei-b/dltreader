@@ -27,7 +27,7 @@ class ApIdFilter: public DLTFilterBase
 public:
     ApIdFilter(bool positive, TextIdSet && set);
     bool virtual match(DLTFileRecord &record) override;
-    bool virtual match(const RecordCollection & records) override;
+    bool virtual match(const DLTRecordSet &records) override;
 private:
     bool positive = true;
     TextIdSet set;
@@ -38,7 +38,7 @@ class CtIdFilter: public DLTFilterBase
 public:
     CtIdFilter(bool positive, TextIdSet && set);
     bool virtual match(DLTFileRecord &record) override;
-    bool virtual match(const RecordCollection & records) override;
+    bool virtual match(const DLTRecordSet & records) override;
 private:
     bool positive = true;
     TextIdSet set;
@@ -49,7 +49,7 @@ class EcuFilter: public DLTFilterBase
 public:
     EcuFilter(bool positive, TextIdSet && set);
     bool virtual match(DLTFileRecord &record) override;
-    bool virtual match(const RecordCollection & records) override;
+    bool virtual match(const DLTRecordSet &records) override;
 private:
     bool positive = true;
     TextIdSet set;

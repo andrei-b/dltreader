@@ -31,7 +31,7 @@ bool ApIdFilter::match(DLTFileRecord &record)
     return !positive;
 }
 
-bool ApIdFilter::match(const RecordCollection &records)
+bool ApIdFilter::match(const DLTRecordSet &records)
 {
 
 }
@@ -53,7 +53,7 @@ bool CtIdFilter::match(DLTFileRecord &record)
     return !positive;
 }
 
-bool CtIdFilter::match(const RecordCollection &records)
+bool CtIdFilter::match(const DLTRecordSet &records)
 {
 
 }
@@ -75,7 +75,7 @@ bool EcuFilter::match(DLTFileRecord &record)
     return !positive;
 }
 
-bool EcuFilter::match(const RecordCollection &records)
+bool EcuFilter::match(const DLTRecordSet &records)
 {
 
 }

@@ -21,7 +21,7 @@ class DLTFilterBase
 {
 public:
     bool virtual match(DLTFileRecord & record) = 0;
-    bool virtual match(const RecordCollection & records) = 0;
+    bool virtual match(const DLTRecordSet & records) = 0;
  };
 
 }

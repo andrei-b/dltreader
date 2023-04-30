@@ -39,7 +39,7 @@ struct DLTFileRecord
     ParsedDLTRecord parse();
 };
 
-using RecordCollection = std::vector<DLTFileRecord>;
+using DLTRecordSet = std::vector<DLTFileRecord>;
 using BufPtr = char*;
 
 enum class ParserState {
@@ -63,7 +63,7 @@ public:
     virtual bool init();
     virtual void reset();
     ParserState parse(DLTFileRecord & record);
-    ParserState parseBatch(RecordCollection & records);
+    ParserState parseBatch(DLTRecordSet & records);
     int32_t recordsCount();
     DLTFileRecordIterator begin();
     DLTFileRecordIterator end();
