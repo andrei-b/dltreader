@@ -27,7 +27,7 @@ class DLTRecordCollection
 public:
     DLTRecordCollection(DLTFileParser & source, const DLTFilterBase & filter);
     explicit DLTRecordCollection(DLTFileParser & source);
-    DLTRecordCollection(DLTRecordCollection & source, const DLTFilterBase & filter);
+    DLTRecordCollection(const DLTRecordCollection &source, const DLTFilterBase & filter);
     DLTRecordCollection(DLTFileRecordIterator begin, DLTFileRecordIterator end);
     DLTRecordCollection(DLTIndexedRecordIterator begin, DLTIndexedRecordIterator end);
     DLTRecordCollection select(const DLTFilterBase & filter) const;
@@ -43,6 +43,7 @@ public:
     DLTIndexedRecordIterator end() const;
     std::string fileName() const;
 private:
+    DLTRecordCollection(SparceIndex && index, const std::string & fileName);
     template <typename Iterator>
     SparceIndex selectInternal(Iterator begin, Iterator end, const DLTFilterBase & filter);
     std::string mFileName;
