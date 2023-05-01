@@ -237,6 +237,11 @@ DLTFileRecordIterator &DLTFileRecordIterator::operator ++()
     return *this;
 }
 
+std::string DLTFileRecordIterator::fileName() const
+{
+    return parser.fileName();
+}
+
 bool DLTFileRecord::operator ==(const DLTFileRecord &other) const
 {
     return this->num == other.num && this->offset == other.offset && this->good == other.good && this->length == other.length && this->msg == other.msg;

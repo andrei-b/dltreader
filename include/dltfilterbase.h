@@ -20,7 +20,7 @@ namespace DLTReader {
 class DLTFilterBase
 {
 public:
-    bool virtual match(DLTFileRecord & record) = 0;
+    virtual bool match(DLTFileRecord & record) const = 0;
     bool virtual match(const DLTRecordSet & records) = 0;
  };
 

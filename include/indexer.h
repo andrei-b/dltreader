@@ -26,6 +26,7 @@ struct Index
 
 struct SparceIndexRecord
 {
+    uint32_t srcNum;
     uint64_t offset = 0;
     uint16_t length = 0;
 };

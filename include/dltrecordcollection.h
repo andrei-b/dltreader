@@ -28,6 +28,8 @@ public:
     DLTRecordCollection(DLTFileParser & source, const DLTFilterBase & filter);
     explicit DLTRecordCollection(DLTFileParser & source);
     DLTRecordCollection(DLTRecordCollection & source, const DLTFilterBase & filter);
+    DLTRecordCollection(DLTFileRecordIterator begin, DLTFileRecordIterator end);
+    DLTRecordCollection(DLTIndexedRecordIterator begin, DLTIndexedRecordIterator end);
     DLTRecordCollection select(const DLTFilterBase & filter) const;
     DLTRecordCollection select(const std::string &payload, bool re) const;
     void filter(const DLTFilterBase & filter);
@@ -39,8 +41,11 @@ public:
     DLTIndexedRecordIterator find(const std::string &payload, bool re, DLTIndexedRecordIterator startFrom) const;
     DLTIndexedRecordIterator begin() const;
     DLTIndexedRecordIterator end() const;
+    std::string fileName() const;
 private:
-    std::string fileName;
+    template <typename Iterator>
+    SparceIndex selectInternal(Iterator begin, Iterator end, const DLTFilterBase & filter);
+    std::string mFileName;
     SparceIndex index;
 };
 
@@ -48,16 +53,19 @@ private:
 class DLTIndexedRecordIterator
 {
 public:
-    static constexpr uint32_t MaxRecordNum = 0xFFFFFFFF;
-    explicit DLTIndexedRecordIterator(DLTRecordCollection & p, uint32_t recordNum = 0);
+    explicit DLTIndexedRecordIterator(DLTRecordCollection & p);
     typedef DLTFileRecord value_type;
     typedef std::ptrdiff_t difference_type;
     typedef DLTFileRecord * pointer;
     typedef DLTFileRecord & reference;
     typedef std::random_access_iterator_tag iterator_category;
     DLTFileRecord operator * () const;
-    bool operator ==(const DLTFileRecordIterator & other) const;
-    bool operator !=(const DLTFileRecordIterator & other) const;
+    bool operator == (const DLTFileRecordIterator & other) const;
+    bool operator != (const DLTFileRecordIterator & other) const {return !(*this == other);}
+    bool operator < (const DLTFileRecordIterator & other) const;
+    bool operator > (const DLTFileRecordIterator & other) const;
+    bool operator >= (const DLTFileRecordIterator & other) const { return !(*this <  other); }
+    bool operator <= (const DLTFileRecordIterator & other) const { return !(*this > other); }
 
     DLTFileRecordIterator & operator ++ ();
     DLTFileRecordIterator & operator -- ();
@@ -66,8 +74,10 @@ public:
     DLTFileRecordIterator operator-(const difference_type& diff) const;
 
     static DLTFileRecordIterator makeEndIterator(DLTRecordCollection & p);
+    std::string fileName() const;
 private:
     DLTRecordCollection & collection;
+    uint32_t currentIndex = 0;
     DLTFileRecord record;
 };
 

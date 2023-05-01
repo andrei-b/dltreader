@@ -103,6 +103,7 @@ public:
     bool operator !=(const DLTFileRecordIterator & other) const;
     DLTFileRecordIterator & operator ++ ();
     static DLTFileRecordIterator makeEndIterator(DLTFileParser & p);
+    std::string fileName() const;
 private:
     DLTFileParser & parser;
     DLTFileRecord record;
