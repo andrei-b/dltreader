@@ -44,6 +44,33 @@ private:
     SparceIndex index;
 };
 
+
+class DLTIndexedRecordIterator
+{
+public:
+    static constexpr uint32_t MaxRecordNum = 0xFFFFFFFF;
+    explicit DLTIndexedRecordIterator(DLTRecordCollection & p, uint32_t recordNum = 0);
+    typedef DLTFileRecord value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef DLTFileRecord * pointer;
+    typedef DLTFileRecord & reference;
+    typedef std::random_access_iterator_tag iterator_category;
+    DLTFileRecord operator * () const;
+    bool operator ==(const DLTFileRecordIterator & other) const;
+    bool operator !=(const DLTFileRecordIterator & other) const;
+
+    DLTFileRecordIterator & operator ++ ();
+    DLTFileRecordIterator & operator -- ();
+    difference_type operator-(const DLTFileRecordIterator& it) const;
+    DLTFileRecordIterator operator+(const difference_type& diff) const;
+    DLTFileRecordIterator operator-(const difference_type& diff) const;
+
+    static DLTFileRecordIterator makeEndIterator(DLTRecordCollection & p);
+private:
+    DLTRecordCollection & collection;
+    DLTFileRecord record;
+};
+
 }
 
 #endif // DLTRECORDCOLLECTION_H

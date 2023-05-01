@@ -14,17 +14,16 @@
 namespace DLTReader {
 
 
-DLTRecordCollection::DLTRecordCollection(DLTFileParser &source, const DLTFilterBase &filter)
+DLTRecordCollection::DLTRecordCollection(DLTFileParser &source, const DLTFilterBase &filter) : fileName(source.fileName())
+{
+}
+
+DLTRecordCollection::DLTRecordCollection(DLTFileParser & source) : fileName(source.fileName())
 {
 
 }
 
-DLTRecordCollection::DLTRecordCollection(DLTFileParser & source)
-{
-
-}
-
-DLTRecordCollection::DLTRecordCollection(DLTRecordCollection &source, const DLTFilterBase &filter)
+DLTRecordCollection::DLTRecordCollection(DLTRecordCollection &source, const DLTFilterBase &filter) : fileName(source.fileName())
 {
 
 }

@@ -24,8 +24,8 @@ namespace DLTReader {
 
 class CachedDLTFile : public DLTFileParser
 {
-    static const uint BufferCount = 2; // do not change
-    static const uint64_t BufferSize = 4096*1024; // this should be greater than the maximum size of the dlt message (64k).
+    static constexpr uint BufferCount = 2; // do not change
+    static constexpr uint64_t BufferSize = 4096*1024; // this should be greater than the maximum size of the dlt message (64k).
     enum BufferState {
         bsReadyForProducer = 0,
         bsReadyForConsumer = 1
