@@ -15,3 +15,7 @@ install(TARGETS dltreader
 add_executable(catdlt examples/catdlt.cpp)
 target_include_directories(catdlt PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(catdlt dltreader)
+
+add_executable(filedump examples/filedump.cpp)
+target_include_directories(filedump PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(filedump dltreader)
