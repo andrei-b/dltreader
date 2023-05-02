@@ -1,4 +1,5 @@
 #include "directdltfile.h"
+#include "dltfileparser.h"
 #include "transferredfiles.h"
 #include <stdio.h>
 
@@ -12,7 +13,7 @@ int main(int argc, char ** argv)
         return 0;
     }
     DLTReader::DirectDLTFile f(argv[1]);
-    DLTReader::TransferredFiles files(f.begin(), f.end());
+    DLTReader::TransferredFiles<DLTReader::DLTFileRecordIterator> files(f.begin(), f.end());
     while (files.findFile()) {
         printf("%s %i %s\n", files.currentFileName().data(), files.currentFileSize(), files.currentFileDate().data());
         auto contents = files.getCurrentFileContents();

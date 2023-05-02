@@ -13,6 +13,8 @@
 
 #define TRANSFERREDFILES_H
 
+#include "dltfileparser.h"
+#include "dltrecordcollection.h"
 #include "dltrecordparser.h"
 #include <string>
 #include <vector>
@@ -27,10 +29,11 @@ enum class FileTransferError {
     WrongDLTFormat
 };
 
+template <typename Iterator>
 class TransferredFiles
 {
 public:
-    TransferredFiles(DLTFileRecordIterator begin, DLTFileRecordIterator end);
+    TransferredFiles(Iterator begin, Iterator end);
     bool findFile();
     std::string currentFileName() const;
     std::string currentFileDate() const;
@@ -42,8 +45,8 @@ public:
      std::vector<char> getCurrentFileContents();
 private:
     std::vector<char> readBlock();
-    DLTFileRecordIterator current;
-    DLTFileRecordIterator end;
+    Iterator current;
+    Iterator end;
     std::string fileName;
     uint32_t fileSize;
     uint32_t blocks;
@@ -55,6 +58,8 @@ private:
     FileTransferError error = FileTransferError::NoError;
 };
 
+template class TransferredFiles<DLTFileRecordIterator>;
+template class TransferredFiles<DLTIndexedRecordIterator>;
 }
 
 #endif // TRANSFERREDFILES_H

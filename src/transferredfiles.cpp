@@ -166,20 +166,23 @@ namespace Package {
     };
 }
 
-TransferredFiles::TransferredFiles(DLTFileRecordIterator begin, DLTFileRecordIterator end) : current(begin), end(end)
+
+template<typename Iterator>
+TransferredFiles<Iterator>::TransferredFiles(Iterator begin, Iterator end) :  current(begin), end(end)
 {
 
 }
 
-bool TransferredFiles::findFile()
+template<typename Iterator>
+bool TransferredFiles<Iterator>::findFile()
 {
     DLTRecordParser p;
     char flst[5] = {'F','L','S','T', '\0'};
-    std::vector<char> Flst = {'F','L','S','T', '\0'};
+//    std::vector<char> Flst = {'F','L','S','T', '\0'};
     uint32_t * ptr = (uint32_t *)flst;
     while(current != end) {
         p.parseHeaders(*current);
-//        auto r = p.extractRecord();
+        auto r = p.extractRecord();
         if (p.payloadLength() > 10) {
             uint32_t * ptr2 = (uint32_t *)(p.payloadPointer()+6);
             if (*ptr == *ptr2) {
@@ -218,27 +221,32 @@ bool TransferredFiles::findFile()
     return false;
 }
 
-std::string TransferredFiles::currentFileName() const
+template<typename Iterator>
+std::string TransferredFiles<Iterator>::currentFileName() const
 {
     return fileName;
 }
 
-std::string TransferredFiles::currentFileDate() const
+template<typename Iterator>
+std::string TransferredFiles<Iterator>::currentFileDate() const
 {
     return fileDate;
 }
 
-uint32_t TransferredFiles::currentFileSize() const
+template<typename Iterator>
+uint32_t TransferredFiles<Iterator>::currentFileSize() const
 {
     return fileSize;
 }
 
-uint32_t TransferredFiles::currentFileId() const
+template<typename Iterator>
+uint32_t TransferredFiles<Iterator>::currentFileId() const
 {
     return fileId;
 }
 
-bool TransferredFiles::saveCurrentFile(const std::string &filename)
+template<typename Iterator>
+bool TransferredFiles<Iterator>::saveCurrentFile(const std::string &filename)
 {
     std::ofstream file;
     file.open(filename);
@@ -255,17 +263,20 @@ bool TransferredFiles::saveCurrentFile(const std::string &filename)
     return true;
 }
 
-FileTransferError TransferredFiles::errorInCurrentFile()
+template<typename Iterator>
+FileTransferError TransferredFiles<Iterator>::errorInCurrentFile()
 {
     return error;
 }
 
-bool TransferredFiles::endOfCurrentFile()
+template<typename Iterator>
+bool TransferredFiles<Iterator>::endOfCurrentFile()
 {
     return eof;
 }
 
-std::vector<char> TransferredFiles::readBlock()
+template<typename Iterator>
+std::vector<char> TransferredFiles<Iterator>::readBlock()
 {
     if (eof || error != FileTransferError::NoError)
         return std::vector<char>();
@@ -333,7 +344,8 @@ std::vector<char> TransferredFiles::readBlock()
     return std::vector<char>();
 }
 
-std::vector<char> TransferredFiles::getCurrentFileContents()
+template<typename Iterator>
+std::vector<char> TransferredFiles<Iterator>::getCurrentFileContents()
 {
     std::vector<char> result;
     auto block = readBlock();

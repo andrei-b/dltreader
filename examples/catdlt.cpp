@@ -9,10 +9,10 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#include "cacheddltfile.h"
 #include "directdltfile.h"
-#include "indexer.h"
-#include "dltrecordparser.h"
+#include "dltrecordcollection.h"
+#include "dltfileparser.h"
+#include "dltrecordcollection.h"
 #include "transferredfiles.h"
 #include <iostream>
 #include <stdio.h>
@@ -23,7 +23,8 @@ using namespace std;
 int main()
 {
         DLTReader::DirectDLTFile f1("/home/andrei/Downloads/joinf.dlt");
-        DLTReader::DirectDLTFile f = std::move(f1);
+        DLTReader::DLTRecordCollection collection(f1);
+        printf("ColSize: %i\n", collection.recordCount());
         /*if (!f.init()) {
             printf("Init failed\n");
             return 0;
@@ -32,7 +33,7 @@ int main()
         //auto index = idx.makeIndex();
         //printf ("index: %i\n", index.size());
         //f.reset();
-        DLTReader::TransferredFiles files(f.begin(), f.end());
+        DLTReader::TransferredFiles<DLTReader::DLTIndexedRecordIterator> files(collection.begin(), collection.end());
         while (files.findFile()) {
             printf("%s %i %s\n", files.currentFileName().data(), files.currentFileSize(), files.currentFileDate().data());
             auto contents = files.getCurrentFileContents();
