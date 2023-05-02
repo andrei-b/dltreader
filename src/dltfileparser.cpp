@@ -250,7 +250,14 @@ bool DLTFileRecord::operator ==(const DLTFileRecord &other) const
 void DLTFileRecord::lightParse()
 {
     DLTRecordParser p;
-    p.parseHeaders(*this);
+    if (!p.parseHeaders(*this)) {
+        apid = nullptr;
+        ctid = nullptr;
+        ecu = nullptr;
+        payload = nullptr;
+        payloadLength = 0;
+        return;
+    }
     apid = p.apid();
     ctid = p.ctid();
     ecu = p.ecuPtr();
@@ -262,7 +269,8 @@ void DLTFileRecord::lightParse()
 ParsedDLTRecord DLTFileRecord::parse()
 {
     DLTRecordParser p;
-    p.parseHeaders(*this);
+    if (!p.parseHeaders(*this))
+        return {0,0,false};
     return p.extractRecord();
 }
 

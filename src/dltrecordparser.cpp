@@ -32,6 +32,8 @@ const uint16_t ExtendedHeaderSize = sizeof(DltExtendedHeader);
 
 bool DLTRecordParser::parseHeaders(const DLTFileRecord &record)
 {
+    if (record.msg == nullptr || record.length == 0)
+        return false;
     messageNumber = record.num;
     offset = record.offset;
     good = record.good;

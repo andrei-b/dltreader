@@ -17,6 +17,8 @@
 #include "indexer.h"
 #include "parseddltrecord.h"
 #include <string>
+#include<iostream>
+#include<fstream>
 
 namespace DLTReader {
 
@@ -42,19 +44,30 @@ public:
     DLTIndexedRecordIterator begin() const;
     DLTIndexedRecordIterator end() const;
     std::string fileName() const;
+    uint32_t recordCount() const;
+    bool fileOpen();
+    bool isFileOpen();
+    DLTFileRecord fileRead(uint32_t indexPosition, bool forward = true);
+    ParsedDLTRecord getRecord(uint32_t indexPosition);
+    void fileClose();
 private:
+    static constexpr uint32_t BufferSize = 1024*1024;
+    std::vector<char> buffer;
+    uint64_t bufferOffset = 0;
+    uint32_t bytesInBuffer = 0;
     DLTRecordCollection(SparceIndex && index, const std::string & fileName);
     template <typename Iterator>
     SparceIndex selectInternal(Iterator begin, Iterator end, const DLTFilterBase & filter);
     std::string mFileName;
     SparceIndex index;
+    std::ifstream file;
 };
 
 
 class DLTIndexedRecordIterator
 {
 public:
-    explicit DLTIndexedRecordIterator(DLTRecordCollection & p);
+    explicit DLTIndexedRecordIterator(const DLTRecordCollection & collection);
     typedef DLTFileRecord value_type;
     typedef std::ptrdiff_t difference_type;
     typedef DLTFileRecord * pointer;
@@ -74,10 +87,10 @@ public:
     DLTFileRecordIterator operator+(const difference_type& diff) const;
     DLTFileRecordIterator operator-(const difference_type& diff) const;
 
-    static DLTFileRecordIterator makeEndIterator(DLTRecordCollection & p);
+    static DLTIndexedRecordIterator makeEndIterator(const DLTRecordCollection & c);
     std::string fileName() const;
 private:
-    DLTRecordCollection & collection;
+    const DLTRecordCollection & collection;
     uint32_t currentIndex = 0;
     DLTFileRecord record;
 };

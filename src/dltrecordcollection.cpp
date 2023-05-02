@@ -17,24 +17,27 @@ namespace DLTReader {
 
 DLTRecordCollection::DLTRecordCollection(DLTFileParser &source, const DLTFilterBase &filter) : mFileName(source.fileName())
 {
+    buffer.reserve(BufferSize);
     index = selectInternal<DLTFileRecordIterator>(source.begin(), source.end(), filter);
 }
 
 DLTRecordCollection::DLTRecordCollection(DLTFileParser & source) : DLTRecordCollection(source.begin(), source.end())
 {
-
+    //buffer.reserve(BufferSize);
 }
 
 DLTRecordCollection::DLTRecordCollection(const DLTRecordCollection &source, const DLTFilterBase &filter) : mFileName(source.fileName())
 {
+    buffer.reserve(BufferSize);
     index = selectInternal<DLTIndexedRecordIterator>(source.begin(), source.end(), filter);
 }
 
 DLTRecordCollection::DLTRecordCollection(DLTFileRecordIterator begin, DLTFileRecordIterator end) : mFileName(begin.fileName())
 {
+    buffer.reserve(BufferSize);
     while(begin != end) {
         auto r = *begin;
-        index.records.push_back({r.num, r.offset, r.length});
+        index.records.push_back({r.num, r.offset, r.length, r.good});
         ++begin;
     }
 }
@@ -58,14 +61,14 @@ void DLTRecordCollection::append(const DLTFileRecord &record)
 {
     auto i = index.records.begin();
     while (i < index.records.end() && i->offset < record.offset) ++i;
-    index.records.insert(i, {record.num, record.offset, record.length});
+    index.records.insert(i, {record.num, record.offset, record.length, record.good});
 }
 
 void DLTRecordCollection::append(const ParsedDLTRecord &record)
 {
     auto i = index.records.begin();
     while (i < index.records.end() && i->offset < record.offset) ++i;
-    index.records.insert(i, {record.num, record.offset, record.payloadSize});
+    index.records.insert(i, {record.num, record.offset, record.payloadSize, record.good});
 }
 
 DLTRecordCollection DLTRecordCollection::join(DLTRecordCollection &collection) const
@@ -104,9 +107,65 @@ std::string DLTRecordCollection::fileName() const
     return mFileName;
 }
 
+uint32_t DLTRecordCollection::recordCount() const
+{
+    return index.records.size();
+}
+
+bool DLTRecordCollection::fileOpen()
+{
+    bufferOffset = 0;
+    bytesInBuffer = 0;
+    if (!file.is_open())
+        file.open(fileName());
+    if (file.is_open()) {
+        return true;
+    }
+    return false;
+}
+
+bool DLTRecordCollection::isFileOpen()
+{
+    return file.is_open();
+}
+
+DLTFileRecord DLTRecordCollection::fileRead(uint32_t indexPosition, bool forward)
+{
+    if (indexPosition >= index.records.size())
+        return {indexPosition, 0, false, 0, nullptr};
+    if (index.records[indexPosition].offset < bufferOffset || index.records[indexPosition].offset >= bufferOffset + bytesInBuffer) {
+        if (forward) {
+            uint32_t i = indexPosition;
+            while (index.records[i+1].offset - index.records[indexPosition].offset + index.records[i+1].length  < BufferSize)
+                ++i;
+            bufferOffset = index.records[indexPosition].offset;
+            bytesInBuffer = index.records[i].offset - index.records[indexPosition].offset + index.records[i].length;
+        } else {
+            uint32_t i = indexPosition;
+            while (index.records[indexPosition].offset + index.records[indexPosition].length - index.records[i-1].offset  < BufferSize)
+                --i;
+            bufferOffset = index.records[i].offset;
+            bytesInBuffer = index.records[indexPosition].offset + index.records[indexPosition].length - index.records[i].offset;
+        }
+        file.seekg(bufferOffset);
+        file.read(buffer.data(), bytesInBuffer);
+    }
+    return {index.records[indexPosition].srcNum, index.records[indexPosition].offset, index.records[indexPosition].good, index.records[indexPosition].length, buffer.data() + index.records[indexPosition].offset - bufferOffset};
+}
+
+ParsedDLTRecord DLTRecordCollection::getRecord(uint32_t indexPosition)
+{
+    return fileRead(indexPosition).parse();
+}
+
+void DLTRecordCollection::fileClose()
+{
+    file.close();
+}
+
 DLTRecordCollection::DLTRecordCollection(SparceIndex &&index, const std::string &fileName) : index(std::move(index)), mFileName(fileName)
 {
-
+    buffer.reserve(BufferSize);
 }
 
 template<typename Iterator>
@@ -117,9 +176,21 @@ SparceIndex DLTRecordCollection::selectInternal(Iterator begin, Iterator end, co
         DLTFileRecord r = *begin;
         DLTFileRecord & rr = r;
         if (filter.match(rr))
-            result.records.push_back({r.num, r.offset, r.length});
+            result.records.push_back({r.num, r.offset, r.length, r.good});
         ++begin;
     }
+    return result;
+}
+
+DLTIndexedRecordIterator::DLTIndexedRecordIterator(const DLTRecordCollection &collection) : collection(collection)
+{
+
+}
+
+DLTIndexedRecordIterator DLTIndexedRecordIterator::makeEndIterator(const DLTRecordCollection &c)
+{
+    DLTIndexedRecordIterator result(c);
+    result.currentIndex = c.recordCount();
     return result;
 }
 
