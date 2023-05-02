@@ -19,7 +19,7 @@ ApIdFilter::ApIdFilter(bool positive, TextIdSet &&set) : positive(positive), set
 
 }
 
-bool ApIdFilter::match(DLTFileRecord &record)
+bool ApIdFilter::match(DLTFileRecord &record) const
 {
     if (!record.headerParsed)
         record.lightParse();
@@ -41,7 +41,7 @@ CtIdFilter::CtIdFilter(bool positive, TextIdSet &&set) : positive(positive), set
 
 }
 
-bool CtIdFilter::match(DLTFileRecord &record)
+bool CtIdFilter::match(DLTFileRecord &record) const
 {
     if (!record.headerParsed)
         record.lightParse();
@@ -63,7 +63,7 @@ EcuFilter::EcuFilter(bool positive, TextIdSet &&set) : positive(positive), set(s
 
 }
 
-bool EcuFilter::match(DLTFileRecord &record)
+bool EcuFilter::match(DLTFileRecord &record) const
 {
     if (!record.headerParsed)
         record.lightParse();

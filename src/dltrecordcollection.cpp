@@ -26,7 +26,7 @@ DLTRecordCollection::DLTRecordCollection(DLTFileParser & source) : DLTRecordColl
     //buffer.reserve(BufferSize);
 }
 
-DLTRecordCollection::DLTRecordCollection(const DLTRecordCollection &source, const DLTFilterBase &filter) : mFileName(source.fileName())
+DLTRecordCollection::DLTRecordCollection(DLTRecordCollection &source, const DLTFilterBase &filter) : mFileName(source.fileName())
 {
     buffer.reserve(BufferSize);
     index = selectInternal<DLTIndexedRecordIterator>(source.begin(), source.end(), filter);
@@ -42,7 +42,7 @@ DLTRecordCollection::DLTRecordCollection(DLTFileRecordIterator begin, DLTFileRec
     }
 }
 
-DLTRecordCollection DLTRecordCollection::select(const DLTFilterBase &filter) const
+DLTRecordCollection DLTRecordCollection::select(const DLTFilterBase &filter)
 {
     return DLTRecordCollection(*this, filter);
 }
@@ -76,7 +76,7 @@ DLTRecordCollection DLTRecordCollection::join(DLTRecordCollection &collection) c
     return DLTRecordCollection(merge(index, collection.index), mFileName);
 }
 
-DLTIndexedRecordIterator DLTRecordCollection::find(const DLTFilterBase &filter, DLTIndexedRecordIterator startFrom) const
+DLTIndexedRecordIterator DLTRecordCollection::find(const DLTFilterBase &filter, DLTIndexedRecordIterator startFrom)
 {
     while(startFrom != end()) {
         auto r = *startFrom;
@@ -87,17 +87,17 @@ DLTIndexedRecordIterator DLTRecordCollection::find(const DLTFilterBase &filter, 
     return end();
 }
 
-DLTIndexedRecordIterator DLTRecordCollection::find(const std::string &payload, bool re, DLTIndexedRecordIterator startFrom) const
+DLTIndexedRecordIterator DLTRecordCollection::find(const std::string &payload, bool re, DLTIndexedRecordIterator startFrom)
 {
 
 }
 
-DLTIndexedRecordIterator DLTRecordCollection::begin() const
+DLTIndexedRecordIterator DLTRecordCollection::begin()
 {
     return DLTIndexedRecordIterator(*this);
 }
 
-DLTIndexedRecordIterator DLTRecordCollection::end() const
+DLTIndexedRecordIterator DLTRecordCollection::end()
 {
     return DLTIndexedRecordIterator::makeEndIterator(*this);
 }
@@ -136,13 +136,13 @@ DLTFileRecord DLTRecordCollection::fileRead(uint32_t indexPosition, bool forward
     if (index.records[indexPosition].offset < bufferOffset || index.records[indexPosition].offset >= bufferOffset + bytesInBuffer) {
         if (forward) {
             uint32_t i = indexPosition;
-            while (index.records[i+1].offset - index.records[indexPosition].offset + index.records[i+1].length  < BufferSize)
+            while (i + 1 < index.records.size() && index.records[i+1].offset - index.records[indexPosition].offset + index.records[i+1].length  < BufferSize)
                 ++i;
             bufferOffset = index.records[indexPosition].offset;
             bytesInBuffer = index.records[i].offset - index.records[indexPosition].offset + index.records[i].length;
         } else {
             uint32_t i = indexPosition;
-            while (index.records[indexPosition].offset + index.records[indexPosition].length - index.records[i-1].offset  < BufferSize)
+            while (i > 0 && index.records[indexPosition].offset + index.records[indexPosition].length - index.records[i-1].offset  < BufferSize)
                 --i;
             bufferOffset = index.records[i].offset;
             bytesInBuffer = index.records[indexPosition].offset + index.records[indexPosition].length - index.records[i].offset;
@@ -182,16 +182,82 @@ SparceIndex DLTRecordCollection::selectInternal(Iterator begin, Iterator end, co
     return result;
 }
 
-DLTIndexedRecordIterator::DLTIndexedRecordIterator(const DLTRecordCollection &collection) : collection(collection)
+DLTIndexedRecordIterator::DLTIndexedRecordIterator(DLTRecordCollection &collection) : collection(collection)
 {
-
+    collection.fileOpen();
+    record = collection.fileRead(0);
 }
 
-DLTIndexedRecordIterator DLTIndexedRecordIterator::makeEndIterator(const DLTRecordCollection &c)
+DLTFileRecord DLTIndexedRecordIterator::operator *() const
+{
+    return record;
+}
+
+bool DLTIndexedRecordIterator::operator ==(const DLTIndexedRecordIterator &other) const
+{
+    return currentIndex == other.currentIndex;
+}
+
+bool DLTIndexedRecordIterator::operator <(const DLTIndexedRecordIterator &other) const
+{
+    return currentIndex < other.currentIndex;
+}
+
+bool DLTIndexedRecordIterator::operator >(const DLTIndexedRecordIterator &other) const
+{
+    return currentIndex > other.currentIndex;
+}
+
+DLTIndexedRecordIterator &DLTIndexedRecordIterator::operator ++()
+{
+    if (currentIndex < collection.recordCount())
+        currentIndex++;
+    record = collection.fileRead(currentIndex);
+    return *this;
+}
+
+DLTIndexedRecordIterator &DLTIndexedRecordIterator::operator --()
+{
+    if (currentIndex > 0)
+        currentIndex--;
+    record = collection.fileRead(currentIndex, false);
+    return *this;
+}
+
+DLTIndexedRecordIterator::difference_type DLTIndexedRecordIterator::operator-(const DLTIndexedRecordIterator &other)
+{
+    return currentIndex-other.currentIndex;
+}
+
+DLTIndexedRecordIterator DLTIndexedRecordIterator::operator-(const difference_type &diff)
+{
+    if (currentIndex >= diff)
+        currentIndex -= diff;
+    else
+        currentIndex = 0;
+    record = collection.fileRead(currentIndex, false);
+    return *this;
+}
+
+DLTIndexedRecordIterator DLTIndexedRecordIterator::operator+(const difference_type &diff)
+{
+    if (currentIndex + diff <= collection.recordCount())
+        currentIndex += diff;
+    else currentIndex = collection.recordCount();
+    record = collection.fileRead(currentIndex);
+    return *this;
+}
+
+DLTIndexedRecordIterator DLTIndexedRecordIterator::makeEndIterator(DLTRecordCollection &c)
 {
     DLTIndexedRecordIterator result(c);
     result.currentIndex = c.recordCount();
     return result;
+}
+
+std::string DLTIndexedRecordIterator::fileName() const
+{
+    return collection.fileName();
 }
 
 }

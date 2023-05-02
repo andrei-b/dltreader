@@ -29,20 +29,20 @@ class DLTRecordCollection
 public:
     DLTRecordCollection(DLTFileParser & source, const DLTFilterBase & filter);
     explicit DLTRecordCollection(DLTFileParser & source);
-    DLTRecordCollection(const DLTRecordCollection &source, const DLTFilterBase & filter);
+    DLTRecordCollection(DLTRecordCollection &source, const DLTFilterBase & filter);
     DLTRecordCollection(DLTFileRecordIterator begin, DLTFileRecordIterator end);
     DLTRecordCollection(DLTIndexedRecordIterator begin, DLTIndexedRecordIterator end);
-    DLTRecordCollection select(const DLTFilterBase & filter) const;
+    DLTRecordCollection select(const DLTFilterBase & filter);
     DLTRecordCollection select(const std::string &payload, bool re) const;
     void filter(const DLTFilterBase & filter);
     void append(DLTRecordCollection & collection);
     void append(const DLTFileRecord & record);
     void append(const ParsedDLTRecord & record);
     DLTRecordCollection join(DLTRecordCollection & collection) const;
-    DLTIndexedRecordIterator find(const DLTFilterBase & filter, DLTIndexedRecordIterator startFrom) const;
-    DLTIndexedRecordIterator find(const std::string &payload, bool re, DLTIndexedRecordIterator startFrom) const;
-    DLTIndexedRecordIterator begin() const;
-    DLTIndexedRecordIterator end() const;
+    DLTIndexedRecordIterator find(const DLTFilterBase & filter, DLTIndexedRecordIterator startFrom);
+    DLTIndexedRecordIterator find(const std::string &payload, bool re, DLTIndexedRecordIterator startFrom) ;
+    DLTIndexedRecordIterator begin();
+    DLTIndexedRecordIterator end();
     std::string fileName() const;
     uint32_t recordCount() const;
     bool fileOpen();
@@ -67,30 +67,30 @@ private:
 class DLTIndexedRecordIterator
 {
 public:
-    explicit DLTIndexedRecordIterator(const DLTRecordCollection & collection);
+    explicit DLTIndexedRecordIterator(DLTRecordCollection &collection);
     typedef DLTFileRecord value_type;
-    typedef std::ptrdiff_t difference_type;
+    typedef uint64_t difference_type;
     typedef DLTFileRecord * pointer;
     typedef DLTFileRecord & reference;
     typedef std::random_access_iterator_tag iterator_category;
     DLTFileRecord operator * () const;
-    bool operator == (const DLTFileRecordIterator & other) const;
-    bool operator != (const DLTFileRecordIterator & other) const {return !(*this == other);}
-    bool operator < (const DLTFileRecordIterator & other) const;
-    bool operator > (const DLTFileRecordIterator & other) const;
-    bool operator >= (const DLTFileRecordIterator & other) const { return !(*this <  other); }
-    bool operator <= (const DLTFileRecordIterator & other) const { return !(*this > other); }
+    bool operator == (const DLTIndexedRecordIterator & other) const;
+    bool operator != (const DLTIndexedRecordIterator & other) const {return !(*this == other);}
+    bool operator < (const DLTIndexedRecordIterator & other) const;
+    bool operator > (const DLTIndexedRecordIterator & other) const;
+    bool operator >= (const DLTIndexedRecordIterator & other) const { return !(*this <  other); }
+    bool operator <= (const DLTIndexedRecordIterator & other) const { return !(*this > other); }
 
-    DLTFileRecordIterator & operator ++ ();
-    DLTFileRecordIterator & operator -- ();
-    difference_type operator-(const DLTFileRecordIterator& it) const;
-    DLTFileRecordIterator operator+(const difference_type& diff) const;
-    DLTFileRecordIterator operator-(const difference_type& diff) const;
+    DLTIndexedRecordIterator &operator ++();
+    DLTIndexedRecordIterator & operator -- ();
+    difference_type operator-(const DLTIndexedRecordIterator& other) ;
+    DLTIndexedRecordIterator operator+(const difference_type& diff);
+    DLTIndexedRecordIterator operator-(const difference_type& diff);
 
-    static DLTIndexedRecordIterator makeEndIterator(const DLTRecordCollection & c);
+    static DLTIndexedRecordIterator makeEndIterator(DLTRecordCollection &c);
     std::string fileName() const;
 private:
-    const DLTRecordCollection & collection;
+    DLTRecordCollection & collection;
     uint32_t currentIndex = 0;
     DLTFileRecord record;
 };
