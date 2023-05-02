@@ -182,7 +182,7 @@ bool TransferredFiles<Iterator>::findFile()
     uint32_t * ptr = (uint32_t *)flst;
     while(current != end) {
         p.parseHeaders(*current);
-        auto r = p.extractRecord();
+        //auto r = p.extractRecord();
         if (p.payloadLength() > 10) {
             uint32_t * ptr2 = (uint32_t *)(p.payloadPointer()+6);
             if (*ptr == *ptr2) {
