@@ -32,17 +32,16 @@ SparceIndex merge(const SparceIndex &index1, const SparceIndex &index2)
                 ++i2;
             }
         }
-        while (i1 < index1.records.size()) {
-            result.records.push_back(index1.records.at(i1));
-            ++i1;
-        }
-        while (i2 < index2.records.size()) {
-            result.records.push_back(index2.records.at(i2));
-            ++i2;
-        }
-        return result;
+     }
+     while (i1 < index1.records.size()) {
+        result.records.push_back(index1.records.at(i1));
+        ++i1;
     }
-
+    while (i2 < index2.records.size()) {
+        result.records.push_back(index2.records.at(i2));
+        ++i2;
+    }
+    return result;
 }
 
 }

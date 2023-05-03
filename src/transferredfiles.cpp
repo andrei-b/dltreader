@@ -11,161 +11,12 @@
 
 #include "transferredfiles.h"
 #include "dltrecordparser.h"
+#include "payloadparser.h"
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 
 namespace DLTReader {
-
-namespace Package {
-
-/*
- * The following values are imported from dlt_protocol.h
- */
-    enum class ValueType {
-        None = 0,
-        Int8 = 33,
-        Int16 = 34,
-        Int32 = 35,
-        Int64 = 36,
-        Int128 = 37,
-        UInt8 = 65,
-        UInt16 = 66,
-        UInt32 = 67,
-        Uint64 = 68,
-        Uint128 = 69,
-        Float = 128,
-        ASCIIString = 512,
-        UTF8String = 0x8200,
-        Binary = 1024
-    };
-
-    struct Value {
-        ValueType type = ValueType::None;
-        int32_t i32val = 0;
-        uint32_t ui32val = 0;
-        std::string stringval;
-        std::vector<char> binaryval;
-        operator std::string() const
-        {
-            return stringval;
-        }
-        const char* data() const {
-            switch (type) {
-            case ValueType::Binary:
-                return binaryval.data();
-            case ValueType::ASCIIString:
-                return stringval.data();
-            default:
-                return nullptr;
-            }
-        }
-        uint16_t dataSize() const {
-            switch (type) {
-            case ValueType::Binary:
-                return binaryval.size();
-            case ValueType::ASCIIString:
-                return stringval.size();
-            default:
-                return 0;
-            }
-        }
-        operator uint16_t() const
-        {
-            return (uint16_t)ui32val;
-        }
-        operator int16_t() const
-        {
-            return (int16_t)i32val;
-        }
-        operator uint32_t() const
-        {
-            return ui32val;
-        }
-        operator int32_t() const
-        {
-            return i32val;
-        }
-        bool operator == (const std::string & other) const
-        {
-            return stringval == other;
-        }
-        bool operator == (const int32_t & other) const
-        {
-            return i32val == other;
-        }
-        bool operator == (const uint32_t & other) const
-        {
-            return ui32val == other;
-        }
-        template<typename T>
-        bool operator != (const T & other) const
-        {
-            return !(*this == other);
-        }
-        bool operator > (uint32_t other) const
-        {
-            return ui32val > other;
-        }
-        bool operator >= (uint32_t other) const
-        {
-            return ui32val >= other;
-        }
-        bool operator < (uint32_t other) const
-        {
-            return !(*this >= other);
-        }
-
-    };
-
-    class PackageParser {
-    public:
-        PackageParser(const char * text, uint16_t len) : mText(text), length(len)
-        {
-        }
-        Value readValue()
-        {
-            Value result;
-            if (pos < length) {
-                result.type = (ValueType)*((uint32_t *) (mText + pos));
-                pos += 4;
-                if (result.type == ValueType::ASCIIString || result.type == ValueType::Binary) {
-                    uint16_t valueLen = *((uint16_t *)(mText + pos));
-                    pos += 2;
-                    if (valueLen != 0) {
-                        if (result.type == ValueType::ASCIIString) {
-                            for(int i = pos; i < pos + valueLen - 1; ++i) // chopping off terminating 0
-                                result.stringval += mText[i];
-                        } else {
-                            result.binaryval.assign(mText + pos, mText + pos + valueLen);
-                        }
-                        pos += valueLen;
-                    }
-                } else
-                if (result.type == ValueType::UInt32 || result.type == ValueType::Int32) {
-                    if (result.type == ValueType::UInt32)
-                        result.ui32val = *((uint32_t*)&mText[pos]);
-                    else
-                        result.i32val = *((int32_t*)&mText[pos]);
-                    pos += 4;
-                }
-                if (result.type == ValueType::UInt16 || result.type == ValueType::Int16) {
-                    if (result.type == ValueType::UInt16)
-                        result.ui32val = *((uint16_t*)&mText[pos]);
-                    else
-                        result.i32val = *((int16_t*)&mText[pos]);
-                    pos += 2;
-                }
-            }
-            return result;
-        }
-    private:
-        const char * mText;
-        uint16_t length;
-        uint16_t pos = 0;
-    };
-}
-
 
 template<typename Iterator>
 TransferredFiles<Iterator>::TransferredFiles(Iterator begin, Iterator end) :  current(begin), end(end)
@@ -184,7 +35,7 @@ bool TransferredFiles<Iterator>::findFile()
         if (p.payloadLength() > 10) {
             uint32_t * ptr2 = (uint32_t *)(p.payloadPointer()+6);
             if (*ptr == *ptr2) {
-                Package::PackageParser pp(p.payloadPointer(), p.payloadLength());
+                PayloadParser pp(p.payloadPointer(), p.payloadLength());
                 auto tag = pp.readValue();
                 if (tag != "FLST") {
                     ++current;
@@ -290,7 +141,7 @@ std::vector<char> TransferredFiles<Iterator>::readBlock()
         //auto r = p.extractRecord();
         if (p.payloadLength() > 10) {
             uint32_t * ptr = (uint32_t *)(p.payloadPointer()+6);
-            Package::PackageParser pp(p.payloadPointer(), p.payloadLength());
+            PayloadParser pp(p.payloadPointer(), p.payloadLength());
             if (*ptr == *fldaptr) {
                 auto tag = pp.readValue();
                 if (tag != "FLDA") {

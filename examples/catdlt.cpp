@@ -14,6 +14,7 @@
 #include "dltfileparser.h"
 #include "dltrecordcollection.h"
 #include "transferredfiles.h"
+#include "payloadparser.h"
 #include <iostream>
 #include <stdio.h>
 
@@ -24,10 +25,12 @@ int main()
 {
     DLTReader::DirectDLTFile f1("/home/andrei/Downloads/test1.dlt");
     DLTReader::ParsedDLTRecord pr;
-    for(const auto & r : f1) {
-        pr = r.parse();
-        //if (r.num > 1000)
-        //    break;
+    for(auto r : f1) {
+        r.lightParse();
+        DLTReader::PayloadParser pp(r.payload,r.payloadLength);
+        std::cout << pp.readValueAsString() << std::endl;
+        if (r.num > 1000)
+            break;
     }
     std::cout << pr.num << "  " << pr.offset << "  " << pr.asString() << std::endl;
     return 0;
