@@ -98,6 +98,8 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
     if (endOfRecords)
         return ParserState::EndOfFile;
     /* read buffer from file */
+    //if (nextMsgPosGlobal == bytesReadTotal)
+    //    printf("Here!");
     while (nextMsgPosGlobal >= bytesReadTotal) {
         bytesRead = readFile(buffer);
         if (bytesRead == 0) {
@@ -136,7 +138,6 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
         nextMsgPosGlobal = currentMsgPosGlobal;
         return ParserState::NeedMoreData;
     } else {
-        mRecordsCount++;
         bool good = true;
         auto hdr0 = (DltStorageHeader *) &buffer[currentMsgPosLocal];
         if (sstrstr((char*)hdr0->pattern, (char*)"DLT\1", 0, 4) != 0) {
@@ -145,8 +146,9 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
         }
         DltStandardHeader * hdr = (DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(DltStorageHeader)];
         length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
-        record = {mRecordsCount-1, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
-        if (nextMsgPosLocal < bytesRead && bytesRead - nextMsgPosLocal <= TotalHeaderSize) {
+        record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
+        mRecordsCount++;
+         if (nextMsgPosLocal < bytesRead && bytesRead - nextMsgPosLocal <= TotalHeaderSize) {
                 bytesReadTotal -= TotalHeaderSize;
                 seek(bytesReadTotal);
         }

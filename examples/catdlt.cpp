@@ -22,12 +22,12 @@ using namespace std;
 
 int main()
 {
-    DLTReader::DirectDLTFile f1("/home/andrei/Downloads/joinfw.dlt");
+    DLTReader::DirectDLTFile f1("/home/andrei/Downloads/test1.dlt");
     DLTReader::ParsedDLTRecord pr;
     for(const auto & r : f1) {
         pr = r.parse();
-       // if (r.num > 1000)
-       //     break;
+        //if (r.num > 1000)
+        //    break;
     }
     std::cout << pr.num << "  " << pr.offset << "  " << pr.asString() << std::endl;
     return 0;
