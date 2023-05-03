@@ -36,7 +36,7 @@ struct DLTFileRecord
     const char * payload;
     bool operator == (const DLTFileRecord & other) const;
     void lightParse();
-    ParsedDLTRecord parse();
+    ParsedDLTRecord parse() const;
 };
 
 using DLTRecordSet = std::vector<DLTFileRecord>;

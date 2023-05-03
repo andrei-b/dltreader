@@ -101,8 +101,7 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
     while (nextMsgPosGlobal >= bytesReadTotal) {
         bytesRead = readFile(buffer);
         if (bytesRead == 0) {
-            endOfRecords = true;
-            return ParserState::EndOfFile;
+            break;
         }
         localMsgOffset = bytesReadTotal;
         bytesReadTotal +=  bytesRead;
@@ -114,7 +113,10 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
     }
     if (bytesRead == 0) {
         endOfRecords = true;
-        return processLastRecord(record);
+        if (nextMsgPosGlobal == bytesReadTotal)
+            if (bytesReadTotal != 0)
+                return processLastRecord(record);
+        return ParserState::EndOfFile;
     }
     nextMsgPosLocal = nextMsgPosGlobal-localMsgOffset;
     currentMsgPosLocal = sstrstr((char*)buffer, (char*)"DLT\1", nextMsgPosLocal, bytesRead);
@@ -143,7 +145,7 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
         }
         DltStandardHeader * hdr = (DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(DltStorageHeader)];
         length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
-        record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
+        record = {mRecordsCount-1, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
         if (nextMsgPosLocal < bytesRead && bytesRead - nextMsgPosLocal <= TotalHeaderSize) {
                 bytesReadTotal -= TotalHeaderSize;
                 seek(bytesReadTotal);
@@ -183,12 +185,13 @@ DLTFileRecordIterator DLTFileParser::end()
 
 ParserState DLTFileParser::processLastRecord(DLTFileRecord &record)
 {
-    auto hdr0 = (DltStorageHeader *) &buffer[nextMsgPosLocal];
-    if (sstrstr((char*)hdr0->pattern, (char*)"DLT\1", 0, 4) != 0) {
-        DltStandardHeader * hdr = (DltStandardHeader *) &buffer[nextMsgPosLocal+sizeof(DltStorageHeader)];
-        length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
+
+        auto hdr0 = (DltStorageHeader *) &buffer[currentMsgPosLocal];
+        if (sstrstr((char*)hdr0->pattern, (char*)"DLT\1", 0, 4) == 0) {
+            DltStandardHeader * hdr = (DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(DltStorageHeader)];
+            length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
         mRecordsCount++;
-        record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
+        record = {mRecordsCount-1, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
         endOfRecords = true;
         return ParserState::HaveRecord;
     }
@@ -266,7 +269,7 @@ void DLTFileRecord::lightParse()
     headerParsed = true;
 }
 
-ParsedDLTRecord DLTFileRecord::parse()
+ParsedDLTRecord DLTFileRecord::parse() const
 {
     DLTRecordParser p;
     if (!p.parseHeaders(*this))

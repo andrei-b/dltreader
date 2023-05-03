@@ -43,6 +43,8 @@ bool DirectDLTFile::resetFile()
 
 uint64_t DirectDLTFile::readFile(BufPtr &buf)
 {
+    if (!mFile.is_open())
+        return 0;
     mFile.read(buffer.data(), BufferSize);
     buf = buffer.data();
     return mFile.gcount();

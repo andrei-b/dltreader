@@ -22,6 +22,15 @@ using namespace std;
 
 int main()
 {
+    DLTReader::DirectDLTFile f1("/home/andrei/Downloads/joinfw.dlt");
+    DLTReader::ParsedDLTRecord pr;
+    for(const auto & r : f1) {
+        pr = r.parse();
+       // if (r.num > 1000)
+       //     break;
+    }
+    std::cout << pr.num << "  " << pr.offset << "  " << pr.asString() << std::endl;
+    return 0;
   /*      {
         DLTReader::DirectDLTFile f1("/home/andrei/Downloads/joinf.dlt");
         auto current = f1.begin();
@@ -39,7 +48,7 @@ int main()
             std::cout << (*current1).num << "  " << (*current1).offset << "  " << (*current1).length << "  " << (*current1).parse().asString() << std::endl;
             ++current1;
         }*/
-    DLTReader::DirectDLTFile f("/home/andrei/Downloads/join.dlt");
+    DLTReader::DirectDLTFile f("/home/andrei/Downloads/joinf.dlt");
      //f1.reset();
      DLTReader::DLTRecordCollection collection(f);
     DLTReader::TransferredFiles<DLTReader::DLTIndexedRecordIterator> files(collection.begin(), collection.end());

@@ -112,7 +112,9 @@ struct ParsedDLTRecord
     }
     std::shared_ptr<char[]> data;
     std::string asString() {
-        return std::string(data.get(), data.get()+payloadSize);
+        if (data != nullptr)
+            return std::string(data.get(), data.get()+payloadSize);
+        return "";
     }
 };
 
