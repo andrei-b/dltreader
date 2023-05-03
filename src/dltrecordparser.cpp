@@ -93,6 +93,11 @@ char *DLTRecordParser::payloadPointer()
     return payloadPtr;
 }
 
+std::string DLTRecordParser::payloadAsString() const
+{
+    return std::string(payloadPtr, payloadPtr+payloadSize);
+}
+
 uint16_t DLTRecordParser::payloadLength()
 {
     if (!good)

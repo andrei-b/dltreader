@@ -22,18 +22,27 @@ using namespace std;
 
 int main()
 {
+  /*      {
         DLTReader::DirectDLTFile f1("/home/andrei/Downloads/joinf.dlt");
-        DLTReader::DLTRecordCollection collection(f1);
-        printf("ColSize: %i\n", collection.recordCount());
-        /*if (!f.init()) {
-            printf("Init failed\n");
-            return 0;
+        auto current = f1.begin();
+        for (int i = 0; i < 32; i++) {
+            std::cout << (*current).num << "  " << (*current).offset << "  " << (*current).length << "  " << (*current).parse().asString() << std::endl;
+            ++current;
+        }
+    }
+       DLTReader::DirectDLTFile f("/home/andrei/Downloads/joinf.dlt");
+        //f1.reset();
+        DLTReader::DLTRecordCollection collection(f);
+        auto current1 = collection.begin();
+        for (int i = 0; i < 32; i++) {
+            auto s = (*current1).parse().asString();
+            std::cout << (*current1).num << "  " << (*current1).offset << "  " << (*current1).length << "  " << (*current1).parse().asString() << std::endl;
+            ++current1;
         }*/
-        //DLTFile::Indexer idx(f);
-        //auto index = idx.makeIndex();
-        //printf ("index: %i\n", index.size());
-        //f.reset();
-        DLTReader::TransferredFiles<DLTReader::DLTIndexedRecordIterator> files(collection.begin(), collection.end());
+    DLTReader::DirectDLTFile f("/home/andrei/Downloads/join.dlt");
+     //f1.reset();
+     DLTReader::DLTRecordCollection collection(f);
+    DLTReader::TransferredFiles<DLTReader::DLTIndexedRecordIterator> files(collection.begin(), collection.end());
         while (files.findFile()) {
             printf("%s %i %s\n", files.currentFileName().data(), files.currentFileSize(), files.currentFileDate().data());
             auto contents = files.getCurrentFileContents();

@@ -32,6 +32,7 @@ public:
     ~DLTRecordParser();
     bool parseHeaders(const DLTFileRecord &record);
     char * payloadPointer();
+    std::string payloadAsString() const;
     uint16_t payloadLength();
     TextId ecu() const;
     const char *ecuPtr() const;

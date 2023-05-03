@@ -136,12 +136,12 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
     } else {
         mRecordsCount++;
         bool good = true;
-        auto hdr0 = (DltStorageHeader *) &buffer[nextMsgPosLocal];
+        auto hdr0 = (DltStorageHeader *) &buffer[currentMsgPosLocal];
         if (sstrstr((char*)hdr0->pattern, (char*)"DLT\1", 0, 4) != 0) {
             printf("Error\n");
             good = false;
         }
-        DltStandardHeader * hdr = (DltStandardHeader *) &buffer[nextMsgPosLocal+sizeof(DltStorageHeader)];
+        DltStandardHeader * hdr = (DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(DltStorageHeader)];
         length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
         record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
         if (nextMsgPosLocal < bytesRead && bytesRead - nextMsgPosLocal <= TotalHeaderSize) {
