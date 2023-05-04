@@ -56,16 +56,41 @@ PayloadValue PayloadParser::readValue()
     return result;
 }
 
-std::string PayloadParser::readValueAsString()
+std::string PayloadParser::payloadAsString()
 {
     if (length == 0)
         return "NULL";
+    std::string result;
+    while (pos < length) {
     auto val = readValue();
-    if (val.type == PayloadValueType::ASCIIString)
-        return (std::string)val;
-    else
-        return "[Non-text data]";
+        switch(val.type) {
+        case PayloadValueType::ASCIIString:
+            result = result + (result.size() > 0 ? " " : "") + val.stringval;
+            break;
+        case PayloadValueType::Int8:
+        case PayloadValueType::Int16:
+        case PayloadValueType::Int32:
+            result = result + (result.size() > 0 ? " " : "") + std::to_string(val.i32val);
+            break;
+        case PayloadValueType::UInt8:
+        case PayloadValueType::UInt16:
+        case PayloadValueType::UInt32:
+            result = result + (result.size() > 0 ? " " : "") + std::to_string(val.ui32val);
+            break;
+        case PayloadValueType::UInt64:
+        case PayloadValueType::Int64:
+
+        case PayloadValueType::Binary:
+            result = result + (result.size() > 0 ? " " : "") + "[Binary Data]";
+            break;
+        default:
+            result = result + (result.size() > 0 ? " " : "") + "[UNKNOWN]";
+        }
+    }
+    return result;
 }
+
+
 
 const char *PayloadValue::data() const {
     switch (type) {

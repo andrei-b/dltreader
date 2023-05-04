@@ -17,8 +17,13 @@
 #include <string>
 #include <vector>
 #include <memory>
+
+namespace __internal {
+
 extern "C" {
 #include "dlt_common.h"
+}
+
 }
 
 namespace DLTReader {
@@ -40,10 +45,10 @@ public:
     const char * ctid() const;
     ParsedDLTRecord extractRecord();
 private:
-    DltStorageHeader * storageHeader = nullptr;
-    DltStandardHeader * standardHeader = nullptr;
-    DltExtendedHeader * extendedHeader = nullptr;
-    DltStandardHeaderExtra headerExtra;
+    __internal::DltStorageHeader * storageHeader = nullptr;
+    __internal::DltStandardHeader * standardHeader = nullptr;
+    __internal::DltExtendedHeader * extendedHeader = nullptr;
+    __internal::DltStandardHeaderExtra headerExtra;
     uint32_t messageNumber;
     uint64_t offset;
     bool good;

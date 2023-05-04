@@ -26,9 +26,9 @@ DLTRecordParser::~DLTRecordParser()
 {
 }
 
-const uint16_t StorageHeaderSize = sizeof(DltStorageHeader);
-const uint16_t StandardHeaderSize = sizeof(DltStandardHeader);
-const uint16_t ExtendedHeaderSize = sizeof(DltExtendedHeader);
+const uint16_t StorageHeaderSize = sizeof(__internal::DltStorageHeader);
+const uint16_t StandardHeaderSize = sizeof(__internal::DltStandardHeader);
+const uint16_t ExtendedHeaderSize = sizeof(__internal::DltExtendedHeader);
 
 bool DLTRecordParser::parseHeaders(const DLTFileRecord &record)
 {
@@ -42,8 +42,8 @@ bool DLTRecordParser::parseHeaders(const DLTFileRecord &record)
         return false;
     }
 
-    storageHeader = (DltStorageHeader*) record.msg;
-    standardHeader = (DltStandardHeader*)(((char*)record.msg) + StorageHeaderSize);
+    storageHeader = (__internal::DltStorageHeader*) record.msg;
+    standardHeader = (__internal::DltStandardHeader*)(((char*)record.msg) + StorageHeaderSize);
     length_t extra_size = DLT_STANDARD_HEADER_EXTRA_SIZE(standardHeader->htyp)+(DLT_IS_HTYP_UEH(standardHeader->htyp) ? ExtendedHeaderSize : 0);
     headerSize = StorageHeaderSize + StandardHeaderSize + extra_size;
     if(DLT_SWAP_16(standardHeader->len)<(static_cast<int>(headerSize) - StorageHeaderSize))
@@ -59,7 +59,7 @@ bool DLTRecordParser::parseHeaders(const DLTFileRecord &record)
     }
     if (extra_size > 0)  {
         if (DLT_IS_HTYP_UEH(standardHeader->htyp)) {
-            extendedHeader = (DltExtendedHeader*) (((char*)record.msg) + StorageHeaderSize + StandardHeaderSize +
+            extendedHeader = (__internal::DltExtendedHeader*) (((char*)record.msg) + StorageHeaderSize + StandardHeaderSize +
                                   DLT_STANDARD_HEADER_EXTRA_SIZE(standardHeader->htyp));
         } else
             extendedHeader = nullptr;

@@ -18,7 +18,7 @@ extern "C" {
 
 namespace DLTReader {
 
-const int32_t TotalHeaderSize = sizeof(DltStorageHeader) + sizeof(DltStandardHeader);
+const int32_t TotalHeaderSize = sizeof(__internal::DltStorageHeader) + sizeof(__internal::DltStandardHeader);
 
 DLTFileParser::DLTFileParser(const std::string &fileName) : mFileName(fileName)
 {
@@ -126,7 +126,7 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
         nextMsgPosGlobal = bytesReadTotal;
         return ParserState::NeedMoreData;
     }
-    DltStandardHeader * hdr = (DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(DltStorageHeader)];
+    __internal::DltStandardHeader * hdr = (__internal::DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(__internal::DltStorageHeader)];
     length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
     //printf("i:%i\n", xLen);
     currentMsgPosGlobal = currentMsgPosLocal + localMsgOffset;
@@ -139,12 +139,12 @@ ParserState DLTFileParser::parse(DLTFileRecord &record)
         return ParserState::NeedMoreData;
     } else {
         bool good = true;
-        auto hdr0 = (DltStorageHeader *) &buffer[currentMsgPosLocal];
+        auto hdr0 = (__internal::DltStorageHeader *) &buffer[currentMsgPosLocal];
         if (sstrstr((char*)hdr0->pattern, (char*)"DLT\1", 0, 4) != 0) {
             printf("Error\n");
             good = false;
         }
-        DltStandardHeader * hdr = (DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(DltStorageHeader)];
+        __internal::DltStandardHeader * hdr = (__internal::DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(__internal::DltStorageHeader)];
         length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
         record = {mRecordsCount, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};
         mRecordsCount++;
@@ -188,9 +188,9 @@ DLTFileRecordIterator DLTFileParser::end()
 ParserState DLTFileParser::processLastRecord(DLTFileRecord &record)
 {
 
-        auto hdr0 = (DltStorageHeader *) &buffer[currentMsgPosLocal];
+        auto hdr0 = (__internal::DltStorageHeader *) &buffer[currentMsgPosLocal];
         if (sstrstr((char*)hdr0->pattern, (char*)"DLT\1", 0, 4) == 0) {
-            DltStandardHeader * hdr = (DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(DltStorageHeader)];
+            __internal::DltStandardHeader * hdr = (__internal::DltStandardHeader *) &buffer[currentMsgPosLocal+sizeof(__internal::DltStorageHeader)];
             length_t msgLen = DLT_BETOH_16(hdr->len) + 16;
         mRecordsCount++;
         record = {mRecordsCount-1, currentMsgPosGlobal, true, msgLen, (char*)hdr0, false};

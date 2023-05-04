@@ -31,8 +31,8 @@ enum class PayloadValueType {
     UInt8 = 65,
     UInt16 = 66,
     UInt32 = 67,
-    Uint64 = 68,
-    Uint128 = 69,
+    UInt64 = 68,
+    UInt128 = 69,
     Float = 128,
     ASCIIString = 512,
     UTF8String = 0x8200,
@@ -102,7 +102,7 @@ class PayloadParser {
 public:
     PayloadParser(const char * text, uint16_t len);
     PayloadValue readValue();
-    std::string readValueAsString();
+    std::string payloadAsString();
 private:
     const char * mText;
     uint16_t length;

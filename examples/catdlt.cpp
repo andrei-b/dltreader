@@ -27,8 +27,8 @@ int main()
     DLTReader::ParsedDLTRecord pr;
     for(auto r : f1) {
         r.lightParse();
-        DLTReader::PayloadParser pp(r.payload,r.payloadLength);
-        std::cout << pp.readValueAsString() << std::endl;
+         DLTReader::PayloadParser pp(r.payload,r.payloadLength);
+        std::cout << r.num << " : " << pp.payloadAsString() << std::endl;
         if (r.num > 1000)
             break;
     }
