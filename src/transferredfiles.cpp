@@ -37,7 +37,7 @@ bool TransferredFiles<Iterator>::findFile()
             if (*ptr == *ptr2) {
                 PayloadParser pp(p.payloadPointer(), p.payloadLength());
                 auto tag = pp.readValue();
-                if (tag != "FLST") {
+                if ((std::string)tag != "FLST") {
                     ++current;
                     continue;
                 }
@@ -54,7 +54,7 @@ bool TransferredFiles<Iterator>::findFile()
                 auto bsize = pp.readValue();
                 this->bsize = bsize;
                 tag  = pp.readValue();
-                if (tag != "FLST") {
+                if ((std::string)tag != "FLST") {
                     ++current;
                     continue;
                 }
@@ -144,7 +144,7 @@ std::vector<char> TransferredFiles<Iterator>::readBlock()
             PayloadParser pp(p.payloadPointer(), p.payloadLength());
             if (*ptr == *fldaptr) {
                 auto tag = pp.readValue();
-                if (tag != "FLDA") {
+                if ((std::string)tag != "FLDA") {
                     ++current;
                     continue;
                 }
@@ -158,7 +158,7 @@ std::vector<char> TransferredFiles<Iterator>::readBlock()
                     error = FileTransferError::BlockMismatch;
                 auto payload = pp.readValue();
                 tag  = pp.readValue();
-                if (tag != "FLDA") {
+                if ((std::string)tag != "FLDA") {
                     error = FileTransferError::WrongDLTFormat;
                 }
                 ++current;

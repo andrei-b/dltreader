@@ -45,9 +45,13 @@ struct PayloadValue {
     uint32_t ui32val = 0;
     uint64_t ui64val = 0;
     int64_t i64val = 0;
-    std::string stringval;
+    std::u32string stringval;
     std::vector<char> binaryval;
     operator std::string() const
+    {
+        return std::string(stringval.begin(), stringval.end());
+    }
+    operator std::u32string() const
     {
         return stringval;
     }
@@ -69,7 +73,7 @@ struct PayloadValue {
     {
         return i32val;
     }
-    bool operator == (const std::string & other) const
+    bool operator == (const std::u32string & other) const
     {
         return stringval == other;
     }
@@ -104,6 +108,7 @@ class PayloadParser {
 public:
     PayloadParser(const char * text, uint16_t len);
     PayloadValue readValue();
+    std::u32string payloadAsU32String();
     std::string payloadAsString();
 private:
     const char * mText;
