@@ -23,6 +23,12 @@ namespace DLTReader
  */
 enum class PayloadValueType {
     None = 0,
+    Bool = 16,
+    Bool8 = 17,
+    Bool16 = 18,
+    Bool32 = 19,
+    Bool64 = 20,
+    Bool128 = 21, // 8-()
     Int8 = 33,
     Int16 = 34,
     Int32 = 35,
@@ -34,6 +40,8 @@ enum class PayloadValueType {
     UInt64 = 68,
     UInt128 = 69,
     Float = 128,
+    Float32 = 131,
+    Float64 = 132,
     ASCIIString = 512,
     UTF8String = 0x8200,
     Binary = 1024
@@ -41,10 +49,13 @@ enum class PayloadValueType {
 
 struct PayloadValue {
     PayloadValueType type = PayloadValueType::None;
+    bool boolVal = false;
     int32_t i32val = 0;
     uint32_t ui32val = 0;
     uint64_t ui64val = 0;
     int64_t i64val = 0;
+    float fl32val = 0;
+    double fl64val = 0;
     std::u32string stringval;
     std::vector<char> binaryval;
     operator std::string() const

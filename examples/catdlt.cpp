@@ -29,7 +29,7 @@ int main()
         r.lightParse();
          DLTReader::PayloadParser pp(r.payload,r.payloadLength);
         std::cout << r.num << " : " << pp.payloadAsString() << std::endl;
-        if (r.num > 1000)
+        if (r.num > 10000)
             break;
     }
     std::cout << pr.num() << "  " << pr.offset() << "  " << pr.rawDataAsString() << std::endl;

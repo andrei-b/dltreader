@@ -31,7 +31,7 @@ PayloadParser::PayloadParser(const char *text, uint16_t len) : mText(text), leng
 PayloadValue PayloadParser::readValue()
 {
     PayloadValue result;
-    if (pos < length) {
+    if (pos < length - 1) {
         result.type = (PayloadValueType)*((uint32_t *) (mText + pos));
         pos += 4;
         if (result.type == PayloadValueType::ASCIIString || result.type == PayloadValueType::Binary || result.type == PayloadValueType::UTF8String) {
@@ -71,7 +71,27 @@ PayloadValue PayloadParser::readValue()
                 result.i64val = *((int64_t*)&mText[pos]);
             pos += 8;
         }
-
+        if (result.type >= PayloadValueType::Bool && result.type <= PayloadValueType::Bool128) {
+            int pow = (int)result.type - (int)PayloadValueType::Bool - 1;
+            if (pow < 0)
+                pow = 0;
+            uint16_t bytes = 1 << pow;
+            for(int i = 0; i < bytes; ++i)
+                if (mText[pos+i] != 0) {
+                    result.boolVal = true;
+                    break;
+                }
+            pos += bytes;
+        }
+        if (result.type == PayloadValueType::Float32 || result.type == PayloadValueType::Float64) {
+            if (result.type == PayloadValueType::Float32) {
+                result.fl32val = *((float*)&mText[pos]);
+                pos += 4;
+            } else {
+                result.fl64val = *((double*)&mText[pos]);
+                pos += 8;
+            }
+        }
     }
     return result;
 }
@@ -81,40 +101,57 @@ std::u32string PayloadParser::payloadAsU32String()
     if (length == 0)
         return U"NULL";
     std::u32string result;
-    while (pos < length) {
+    while (pos < length - 1) {
         auto val = readValue();
         std::string strval;
+        result = result + (result.size() > 0 ? U" " : U"");
         switch(val.type) {
+        case PayloadValueType::Bool:
+        case PayloadValueType::Bool8:
+        case PayloadValueType::Bool16:
+        case PayloadValueType::Bool32:
+        case PayloadValueType::Bool64:
+        case PayloadValueType::Bool128:
+            result = result + (val.boolVal ? U"true" : U"false");
         case PayloadValueType::ASCIIString:
         case PayloadValueType::UTF8String:
-            result = result + (result.size() > 0 ? U" " : U"") + val.stringval;
+            result = result + val.stringval;
             break;
         case PayloadValueType::Int8:
         case PayloadValueType::Int16:
         case PayloadValueType::Int32:
             strval = std::to_string(val.i32val);
-            result = result + (result.size() > 0 ? U" " : U"") + std::u32string(strval.begin(), strval.end());
+            result = result + std::u32string(strval.begin(), strval.end());
             break;
         case PayloadValueType::UInt8:
         case PayloadValueType::UInt16:
         case PayloadValueType::UInt32:
             strval = std::to_string(val.ui32val);
-            result = result + (result.size() > 0 ? U" " : U"") + std::u32string(strval.begin(), strval.end());
+            result = result + std::u32string(strval.begin(), strval.end());
             break;
         case PayloadValueType::UInt64:
             strval = std::to_string(val.ui64val);
-            result = result + (result.size() > 0 ? U" " : U"") + std::u32string(strval.begin(), strval.end());
+            result = result + std::u32string(strval.begin(), strval.end());
             break;
         case PayloadValueType::Int64:
             strval = std::to_string(val.i64val);
-            result = result + (result.size() > 0 ? U" " : U"") + std::u32string(strval.begin(), strval.end());
+            result = result + std::u32string(strval.begin(), strval.end());
+            break;
+        case PayloadValueType::Float:
+        case PayloadValueType::Float32:
+            strval = std::to_string(val.fl32val);
+            result = result + std::u32string(strval.begin(), strval.end());
+            break;
+        case PayloadValueType::Float64:
+            strval = std::to_string(val.fl64val);
+            result = result + std::u32string(strval.begin(), strval.end());
             break;
         case PayloadValueType::Binary:
-            result = result + (result.size() > 0 ? U" " : U"") + U"[Binary Data]";
+            result = result + U"[Binary Data]";
             break;
         default:
-            //auto ass = std::string(mText, length);
-            result = result + (result.size() > 0 ? U" " : U"") + U"[UNKNOWN]";
+            auto ass = std::string(mText, length);
+            result = result + U"[UNKNOWN]";
         }
     }
     return result;
