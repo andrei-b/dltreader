@@ -32,7 +32,7 @@ int main()
         if (r.num > 1000)
             break;
     }
-    std::cout << pr.num << "  " << pr.offset << "  " << pr.asString() << std::endl;
+    std::cout << pr.num() << "  " << pr.offset() << "  " << pr.rawDataAsString() << std::endl;
     return 0;
   /*      {
         DLTReader::DirectDLTFile f1("/home/andrei/Downloads/joinf.dlt");

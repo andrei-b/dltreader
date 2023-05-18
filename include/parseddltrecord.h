@@ -88,35 +88,61 @@ enum class DLTLogMode {
 };
 
 
-struct ParsedDLTRecord
+class ParsedDLTRecord
 {
-    uint32_t num = 0;
-    uint64_t offset = 0;
-    bool good = true;
-    TextId ecu;
-    TextId apid;
-    TextId ctid;
-    DLTMessageType type;
-    uint8_t subtype;
-    DLTLogMode mode;
-    uint32_t sessionId;
-    uint32_t seconds = 0;
-    uint32_t microseconds = 0;
-    uint32_t timestamp = 0;
-    uint16_t payloadSize;
-    void set(const char * src, uint16_t length)
-    {
-       data.reset(new char[length]);
-       payloadSize = length;
-       std::copy(src, src+payloadSize, data.get());
-    }
+public:
+    ParsedDLTRecord();
+    void setPayload(const char * src, uint16_t length);
+    std::string rawDataAsString();
+    template <typename T>
+    T payloadAs();
+    uint32_t num() const;
+    void setNum(uint32_t newNum);
+    uint64_t offset() const;
+    void setOffset(uint64_t newOffset);
+    bool good() const;
+    void setGood(bool newGood);
+    TextId ecu();
+    void setEcu(const TextId &newEcu);
+    TextId apid();
+    void setApid(const TextId &newApid);
+    TextId ctid();
+    void setCtid(const TextId &newCtid);
+    DLTMessageType type() const;
+    void setType(DLTMessageType newType);
+    uint8_t subtype() const;
+    void setSubtype(uint8_t newSubtype);
+    DLTLogMode mode() const;
+    void setMode(DLTLogMode newMode);
+    uint32_t sessionId() const;
+    void setSessionId(uint32_t newSessionId);
+    uint32_t seconds() const;
+    void setSeconds(uint32_t newSeconds);
+    uint32_t microseconds() const;
+    void setMicroseconds(uint32_t newMicroseconds);
+    uint32_t timestamp() const;
+    void setTimestamp(uint32_t newTimestamp);
+    uint16_t payloadSize() const;
+    void setPayloadSize(uint16_t newPayloadSize);
+private:
+    uint32_t mNum = 0;
+    uint64_t mOffset = 0;
+    bool mGood = true;
+    TextId mEcu;
+    TextId mApid;
+    TextId mCtid;
+    DLTMessageType mType;
+    uint8_t mSubtype;
+    DLTLogMode mMode;
+    uint32_t mSessionId;
+    uint32_t mSeconds = 0;
+    uint32_t mMicroseconds = 0;
+    uint32_t mTimestamp = 0;
+    uint16_t mPayloadSize;
     std::shared_ptr<char[]> data;
-    std::string asString() {
-        if (data != nullptr)
-            return std::string(data.get(), data.get()+payloadSize);
-        return "";
-    }
+    std::u32string parsedPayload;
 };
+
 
 }
 

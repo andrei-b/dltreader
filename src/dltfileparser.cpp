@@ -275,7 +275,7 @@ ParsedDLTRecord DLTFileRecord::parse() const
 {
     DLTRecordParser p;
     if (!p.parseHeaders(*this))
-        return {0,0,false};
+        return ParsedDLTRecord();
     return p.extractRecord();
 }
 

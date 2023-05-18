@@ -67,8 +67,8 @@ void DLTRecordCollection::append(const DLTFileRecord &record)
 void DLTRecordCollection::append(const ParsedDLTRecord &record)
 {
     auto i = index.records.begin();
-    while (i < index.records.end() && i->offset < record.offset) ++i;
-    index.records.insert(i, {record.num, record.offset, record.payloadSize, record.good});
+    while (i < index.records.end() && i->offset < record.offset()) ++i;
+    index.records.insert(i, {record.num(), record.offset(), record.payloadSize(), record.good()});
 }
 
 DLTRecordCollection DLTRecordCollection::join(DLTRecordCollection &collection) const
