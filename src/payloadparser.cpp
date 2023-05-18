@@ -151,7 +151,8 @@ std::u32string PayloadParser::payloadAsU32String()
             break;
         default:
             auto ass = std::string(mText, length);
-            result = result + U"[UNKNOWN]";
+            if (ass.find("StatusActivationWire") != std::string::npos)
+                result = result + U"[UNKNOWN]";
         }
     }
     return result;

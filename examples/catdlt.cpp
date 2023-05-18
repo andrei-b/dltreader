@@ -26,9 +26,11 @@ int main()
     DLTReader::DirectDLTFile f1("/home/andrei/Downloads/test1.dlt");
     DLTReader::ParsedDLTRecord pr;
     for(auto r : f1) {
-        r.lightParse();
+         r.lightParse();
          DLTReader::PayloadParser pp(r.payload,r.payloadLength);
-        std::cout << r.num << " : " << pp.payloadAsString() << std::endl;
+        DLTReader::ParsedDLTRecord pr(r);
+         std::cout << pr.num() << " : " << pr.timeAs<std::string>(DLTReader::DefaultTimeFormat, 0) << " : " << pr.payloadAs<std::string>() << std::endl;
+
         if (r.num > 10000)
             break;
     }

@@ -12,7 +12,6 @@
 #include "parseddltrecord.h"
 #include "payloadparser.h"
 #include "dltrecordparser.h"
-#include <iomanip>
 
 namespace DLTReader {
 
@@ -172,10 +171,16 @@ void ParsedDLTRecord::setPayloadSize(uint16_t newPayloadSize)
     mPayloadSize = newPayloadSize;
 }
 
-tm ParsedDLTRecord::time(int32_t shift)
+tm ParsedDLTRecord::wallTime(int32_t shift)
 {
-    time_t ltime = mTimestamp + shift;
+    time_t ltime = mSeconds + shift;
     return *(std::localtime(&ltime));
+}
+
+void ParsedDLTRecord::parsePayload()
+{
+        PayloadParser pp(data.get(), mPayloadSize);
+        parsedPayload = pp.payloadAsU32String();
 }
 
 void ParsedDLTRecord::setApid(const TextId &newApid)
@@ -186,26 +191,6 @@ void ParsedDLTRecord::setApid(const TextId &newApid)
 uint32_t ParsedDLTRecord::num() const
 {
     return mNum;
-}
-
-template<typename T>
-T ParsedDLTRecord::payloadAs()
-{
-    if (parsedPayload.size() == 0) {
-        PayloadParser pp(data.get(), mPayloadSize);
-        parsedPayload = pp.payloadAsU32String();
-    }
-    return T(parsedPayload.begin(), parsedPayload.end());
-}
-
-template<typename T>
-T ParsedDLTRecord::timeAs(const std::string &format, int32_t shift)
-{
-    auto tm = time(shift);
-    std::ostringstream oss;
-    oss << std::put_time(&tm, format.data());
-    auto s = oss.str();
-    return T(s.begin(), s.end());
 }
 
 }
