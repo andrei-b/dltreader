@@ -57,6 +57,13 @@ PayloadValue PayloadParser::readValue()
                     result.i32val = *((int32_t*)&mText[pos]);
                 pos += 4;
             }
+        if (result.type == PayloadValueType::UInt8 || result.type == PayloadValueType::Int8) {
+            if (result.type == PayloadValueType::UInt16)
+                result.ui32val = *((uint8_t*)&mText[pos]);
+            else
+                result.i32val = *((int8_t*)&mText[pos]);
+            pos += 1;
+        }
         if (result.type == PayloadValueType::UInt16 || result.type == PayloadValueType::Int16) {
             if (result.type == PayloadValueType::UInt16)
                 result.ui32val = *((uint16_t*)&mText[pos]);
@@ -150,10 +157,13 @@ std::u32string PayloadParser::payloadAsU32String()
             result = result + U"[Binary Data]";
             break;
         default:
-            auto ass = std::string(mText, length);
-            if (ass.find("StatusActivationWire") != std::string::npos)
-                result = result + U"[UNKNOWN]";
+            //auto ass = std::string(mText, length);
+            break;
         }
+    }
+    if (result == U"") {
+        auto ass = std::string(mText, length);
+        return U"X";
     }
     return result;
 }
