@@ -131,50 +131,48 @@ const char *DLTRecordParser::ctid() const
     return nullptr;
 }
 
-ParsedDLTRecord DLTRecordParser::extractRecord()
+void DLTRecordParser::parseAll(ParsedDLTRecord &record)
 {
-    ParsedDLTRecord out;
-    out.setNum(messageNumber);
-    out.setOffset(offset);
-    out.setGood(good);
+    record.setNum(messageNumber);
+    record.setOffset(offset);
+    record.setGood(good);
     if(storageHeader) {
-        out.setSeconds(storageHeader->seconds);
-        out.setMicroseconds(storageHeader->microseconds);
+        record.setSeconds(storageHeader->seconds);
+        record.setMicroseconds(storageHeader->microseconds);
     } else {
-        out.setSeconds(0);
-        out.setMicroseconds(0);
+        record.setSeconds(0);
+        record.setMicroseconds(0);
     }
     if ( DLT_IS_HTYP_WTMS(standardHeader->htyp) )
-        out.setTimestamp(headerExtra.tmsp);
+        record.setTimestamp(headerExtra.tmsp);
      else
-        out.setTimestamp(0);
+        record.setTimestamp(0);
 
     if (DLT_IS_HTYP_WEID(standardHeader->htyp))
-        out.setEcu(headerExtra.ecu);
+        record.setEcu(headerExtra.ecu);
     else {
         if(storageHeader)
-            out.setEcu(storageHeader->ecu);
+            record.setEcu(storageHeader->ecu);
     }
 
     if (DLT_IS_HTYP_UEH(standardHeader->htyp)) {
         if (extendedHeader->apid[0] != 0)
-            out.setApid(extendedHeader->apid);
+            record.setApid(extendedHeader->apid);
         if (extendedHeader->ctid[0]!=0)
-           out.setCtid(extendedHeader->ctid);
-        out.setType((DLTMessageType) DLT_GET_MSIN_MSTP(extendedHeader->msin));
-        out.setSubtype(DLT_GET_MSIN_MTIN(extendedHeader->msin));
+           record.setCtid(extendedHeader->ctid);
+        record.setType((DLTMessageType) DLT_GET_MSIN_MSTP(extendedHeader->msin));
+        record.setSubtype(DLT_GET_MSIN_MTIN(extendedHeader->msin));
         if(DLT_IS_MSIN_VERB(extendedHeader->msin)) {
-            out.setMode(DLTLogMode::Verbose);
+            record.setMode(DLTLogMode::Verbose);
         } else {
-            out.setMode(DLTLogMode::NonVerbose);
+            record.setMode(DLTLogMode::NonVerbose);
         }
     } else
-        out.setMode(DLTLogMode::NonVerbose);
-    out.setPayloadSize(payloadSize);
-    out.setPayload(payloadPtr, payloadSize);
-    out.setSessionId(headerExtra.seid);
-    return out;
-}
+        record.setMode(DLTLogMode::NonVerbose);
+    record.setPayloadSize(payloadSize);
+    record.setPayload(payloadPtr, payloadSize);
+    record.setSessionId(headerExtra.seid);
+ }
 
 
 

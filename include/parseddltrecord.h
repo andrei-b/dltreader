@@ -12,8 +12,10 @@
 #ifndef PARSEDDLTRECORD_H
 #define PARSEDDLTRECORD_H
 
+#include "dltfilerecord.h"
 #include <string>
 #include <memory>
+#include <ctime>
 
 namespace DLTReader
 {
@@ -91,7 +93,9 @@ enum class DLTLogMode {
 class ParsedDLTRecord
 {
 public:
+    const std::string DefaultTimeFormat = "%d-%m-%Y %H:%M:%S";
     ParsedDLTRecord();
+    explicit ParsedDLTRecord(const DLTFileRecord &record);
     void setPayload(const char * src, uint16_t length);
     std::string rawDataAsString();
     template <typename T>
@@ -124,6 +128,9 @@ public:
     void setTimestamp(uint32_t newTimestamp);
     uint16_t payloadSize() const;
     void setPayloadSize(uint16_t newPayloadSize);
+    struct std::tm time(int32_t shift = 0);
+    template <typename T>
+    T timeAs(const std::string& format, int32_t shift = 0);
 private:
     uint32_t mNum = 0;
     uint64_t mOffset = 0;

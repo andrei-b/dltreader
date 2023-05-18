@@ -247,36 +247,4 @@ std::string DLTFileRecordIterator::fileName() const
     return parser.fileName();
 }
 
-bool DLTFileRecord::operator ==(const DLTFileRecord &other) const
-{
-    return this->num == other.num && this->offset == other.offset && this->good == other.good && this->length == other.length && this->msg == other.msg;
-}
-
-void DLTFileRecord::lightParse()
-{
-    DLTRecordParser p;
-    if (!p.parseHeaders(*this)) {
-        apid = nullptr;
-        ctid = nullptr;
-        ecu = nullptr;
-        payload = nullptr;
-        payloadLength = 0;
-        return;
-    }
-    apid = p.apid();
-    ctid = p.ctid();
-    ecu = p.ecuPtr();
-    payload = p.payloadPointer();
-    payloadLength = p.payloadLength();
-    headerParsed = true;
-}
-
-ParsedDLTRecord DLTFileRecord::parse() const
-{
-    DLTRecordParser p;
-    if (!p.parseHeaders(*this))
-        return ParsedDLTRecord();
-    return p.extractRecord();
-}
-
 }

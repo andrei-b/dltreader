@@ -155,7 +155,7 @@ DLTFileRecord DLTRecordCollection::fileRead(uint32_t indexPosition, bool forward
 
 ParsedDLTRecord DLTRecordCollection::getRecord(uint32_t indexPosition)
 {
-    return fileRead(indexPosition).parse();
+    return ParsedDLTRecord(fileRead(indexPosition));
 }
 
 void DLTRecordCollection::fileClose()

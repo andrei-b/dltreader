@@ -11,11 +11,22 @@
 
 #include "parseddltrecord.h"
 #include "payloadparser.h"
+#include "dltrecordparser.h"
+#include <iomanip>
 
 namespace DLTReader {
 
 ParsedDLTRecord::ParsedDLTRecord() : mNum(0), mOffset(0), mGood(false)
 {
+}
+
+ParsedDLTRecord::ParsedDLTRecord(const DLTFileRecord &record)
+{
+    DLTRecordParser p;
+    if (!p.parseHeaders(record))
+        ParsedDLTRecord();
+    else
+        p.parseAll(*this);
 }
 
 void ParsedDLTRecord::setPayload(const char *src, uint16_t length)
@@ -161,6 +172,12 @@ void ParsedDLTRecord::setPayloadSize(uint16_t newPayloadSize)
     mPayloadSize = newPayloadSize;
 }
 
+tm ParsedDLTRecord::time(int32_t shift)
+{
+    time_t ltime = mTimestamp + shift;
+    return *(std::localtime(&ltime));
+}
+
 void ParsedDLTRecord::setApid(const TextId &newApid)
 {
     mApid = newApid;
@@ -179,6 +196,16 @@ T ParsedDLTRecord::payloadAs()
         parsedPayload = pp.payloadAsU32String();
     }
     return T(parsedPayload.begin(), parsedPayload.end());
+}
+
+template<typename T>
+T ParsedDLTRecord::timeAs(const std::string &format, int32_t shift)
+{
+    auto tm = time(shift);
+    std::ostringstream oss;
+    oss << std::put_time(&tm, format.data());
+    auto s = oss.str();
+    return T(s.begin(), s.end());
 }
 
 }

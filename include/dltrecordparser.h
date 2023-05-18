@@ -43,7 +43,7 @@ public:
     const char *ecuPtr() const;
     const char * apid() const;
     const char * ctid() const;
-    ParsedDLTRecord extractRecord();
+    void parseAll(ParsedDLTRecord & record);
 private:
     __internal::DltStorageHeader * storageHeader = nullptr;
     __internal::DltStandardHeader * standardHeader = nullptr;

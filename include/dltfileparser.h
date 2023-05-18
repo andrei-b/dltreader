@@ -12,34 +12,12 @@
 #ifndef DLTFILEPARSER_H
 #define DLTFILEPARSER_H
 
-#include "parseddltrecord.h"
+#include "dltfilerecord.h"
 #include <string>
 #include <vector>
 #include <iterator>
 
 namespace DLTReader {
-
-using length_t = uint16_t;
-
-struct DLTFileRecord
-{
-    uint32_t num = 0;
-    uint64_t offset = 0;
-    bool good = true;
-    length_t length = 0;
-    char * msg = nullptr;
-    bool headerParsed = false;
-    const char * ctid;
-    const char * apid;
-    const char * ecu;
-    uint16_t payloadLength;
-    const char * payload;
-    bool operator == (const DLTFileRecord & other) const;
-    void lightParse();
-    ParsedDLTRecord parse() const;
-};
-
-using DLTRecordSet = std::vector<DLTFileRecord>;
 using BufPtr = char*;
 
 enum class ParserState {
