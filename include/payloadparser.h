@@ -43,6 +43,8 @@ struct PayloadValue {
     PayloadValueType type = PayloadValueType::None;
     int32_t i32val = 0;
     uint32_t ui32val = 0;
+    uint64_t ui64val = 0;
+    int64_t i64val = 0;
     std::string stringval;
     std::vector<char> binaryval;
     operator std::string() const

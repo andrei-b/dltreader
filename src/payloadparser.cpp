@@ -52,6 +52,14 @@ PayloadValue PayloadParser::readValue()
                 result.i32val = *((int16_t*)&mText[pos]);
             pos += 2;
         }
+        if (result.type == PayloadValueType::UInt64 || result.type == PayloadValueType::Int64) {
+            if (result.type == PayloadValueType::UInt64)
+                result.ui64val = *((uint64_t*)&mText[pos]);
+            else
+                result.i64val = *((int64_t*)&mText[pos]);
+            pos += 8;
+        }
+
     }
     return result;
 }
@@ -67,6 +75,9 @@ std::string PayloadParser::payloadAsString()
         case PayloadValueType::ASCIIString:
             result = result + (result.size() > 0 ? " " : "") + val.stringval;
             break;
+        case PayloadValueType::UTF8String:
+            result = result + (result.size() > 0 ? " " : "") + val.stringval;
+            break;
         case PayloadValueType::Int8:
         case PayloadValueType::Int16:
         case PayloadValueType::Int32:
@@ -78,12 +89,16 @@ std::string PayloadParser::payloadAsString()
             result = result + (result.size() > 0 ? " " : "") + std::to_string(val.ui32val);
             break;
         case PayloadValueType::UInt64:
+            result = result + (result.size() > 0 ? " " : "") + std::to_string(val.ui64val);
+            break;
         case PayloadValueType::Int64:
-
+            result = result + (result.size() > 0 ? " " : "") + std::to_string(val.i64val);
+            break;
         case PayloadValueType::Binary:
             result = result + (result.size() > 0 ? " " : "") + "[Binary Data]";
             break;
         default:
+            //auto ass = std::string(mText, length);
             result = result + (result.size() > 0 ? " " : "") + "[UNKNOWN]";
         }
     }
