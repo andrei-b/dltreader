@@ -12,9 +12,9 @@
 #include "directdltfile.h"
 #include "dltrecordcollection.h"
 #include "dltfileparser.h"
-#include "dltrecordcollection.h"
 #include "transferredfiles.h"
 #include "payloadparser.h"
+#include "version.h"
 #include <iostream>
 #include <stdio.h>
 
@@ -29,7 +29,7 @@ int main()
          r.lightParse();
          DLTReader::PayloadParser pp(r.payload,r.payloadLength);
         DLTReader::ParsedDLTRecord pr(r);
-         std::cout << pr.num() << " : " << pr.walltimeToString<std::string>(DLTReader::ParsedDLTRecord::DefaultTimeFormat, 0) << " : " << pr.payloadAsString<std::string>() << std::endl;
+         std::cout << pr.recordToString<std::string>("{num}\t{ecu}\t{apid}\t{ctid}\t{sessid}\t{type}\t{mode}\t{walltime}\t{timestamp}\t{payload}", DLTReader::ParsedDLTRecord::DefaultTimeFormat) << std::endl;
 
         if (r.num > 10000)
             break;

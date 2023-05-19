@@ -12,7 +12,17 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+namespace DLTReader {
+
 #define API_VERSION "0.1b"
-const char * APIVersion = API_VERSION;
+constexpr char APIVersion[] = API_VERSION;
+
+#define PACKAGE_VERSION "0.1b"
+constexpr char PackageVersion[] = PACKAGE_VERSION;
+
+#define PACKAGE_STATE "unstable"
+constexpr char PackageState[] = PACKAGE_STATE;
+
+}
 
 #endif // VERSION_H

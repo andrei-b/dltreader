@@ -171,32 +171,29 @@ public:
     template <typename StringT>
     StringT typeToString ()
     {
-        std::string s = dltMessageTypeToString.at(type());
+        auto s = dltMessageTypeToString.at(type());
         return StringT(s.begin(), s.end());
     }
     template <typename StringT>
     StringT modeToString ()
     {
-        std::string s = dltLogModeToString.at(mode());
+        auto s = dltLogModeToString.at(mode());
         return StringT(s.begin(), s.end());
     }
     template <typename StringT>
     StringT apidToString ()
     {
-        auto t = apid();
-        return StringT(t.data, t.data+4);
+        return textidToString<StringT>(apid());
     }
     template <typename StringT>
     StringT ctidToString ()
     {
-        auto t = ctid();
-        return StringT(t.data, t.data+4);
+        return textidToString<StringT>(ctid());
     }
     template <typename StringT>
     StringT ecuToString ()
     {
-        auto t = ecu();
-        return StringT(t.data, t.data+4);
+        return textidToString<StringT>(ecu());
     }
     template <typename StringT>
     StringT walltimeToString (const std::string& format, int32_t shift = 0)
@@ -211,10 +208,47 @@ public:
     template <typename StringT>
     StringT recordToString (const std::string& format, const std::string& walltimeFormat, int32_t walltimeShift = 0, bool whitewashNewlines = false)
     {
-        auto wtime = walltimeToString<StringT>(walltimeFormat, walltimeShift);
-        auto payload = payloadAsString<StringT>(whitewashNewlines);
+        auto phNum = toString<StringT>("{num}");
+        auto phWtime = toString<StringT>("{walltime}");
+        auto phPayload = toString<StringT>("{payload}");
+        auto phApid = toString<StringT>("{apid}");
+        auto phCtid = toString<StringT>("{ctid}");
+        auto phEcu = toString<StringT>("{ecu}");
+        auto phTimestamp = toString<StringT>("{timestamp}");
+        auto phMode = toString<StringT>("{mode}");
+        auto phType = toString<StringT>("{type}");
+        auto phSessId = toString<StringT>("{sessid}");
+        auto wformat = toString<StringT>(format);
+        replace(wformat, phPayload, payloadAsString<StringT>(whitewashNewlines));
+        replace(wformat, phWtime, walltimeToString<StringT>(walltimeFormat, walltimeShift));
+        replace(wformat, phTimestamp, toString<StringT>(std::to_string(timestamp())));
+        replace(wformat, phApid, apidToString<StringT>());
+        replace(wformat, phCtid, ctidToString<StringT>());
+        replace(wformat, phEcu, ecuToString<StringT>());
+        replace(wformat, phMode, modeToString<StringT>());
+        replace(wformat, phType, typeToString<StringT>());
+        replace(wformat, phSessId, toString<StringT>(std::to_string(sessionId())));
+        replace(wformat, phNum, toString<StringT>(std::to_string(num())));
+        return wformat;
     }
 private:
+    template <typename StringT>
+    StringT toString(const std::string s)
+    {
+        return StringT(s.begin(), s.end());
+    }
+    template <typename StringT>
+    void replace(StringT & where, StringT & what, StringT && with) {
+        where.replace(where.find(what), what.size(), with);
+    }
+    template <typename StringT>
+    StringT textidToString(const TextId & t) {
+        int len = 0;
+        for (int i = 0; i < 4; ++i)
+            if (t.data[i] >= 'A' && t.data[i] <= 'Z')
+                len++;
+        return StringT(t.data, t.data+len);
+    }
     void parsePayload();
     uint32_t mNum = 0;
     uint64_t mOffset = 0;
