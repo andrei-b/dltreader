@@ -55,7 +55,7 @@ int main()
         }*/
     DLTReader::DirectDLTFile f("/home/andrei/Downloads/joinf.dlt");
      //f1.reset();
-     DLTReader::DLTRecordCollection collection(f);
+    DLTReader::DLTRecordCollection collection(f);
     DLTReader::TransferredFiles<DLTReader::DLTIndexedRecordIterator> files(collection.begin(), collection.end());
         while (files.findFile()) {
             printf("%s %i %s\n", files.currentFileName().data(), files.currentFileSize(), files.currentFileDate().data());

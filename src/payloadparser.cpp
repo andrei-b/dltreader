@@ -158,12 +158,11 @@ std::u32string PayloadParser::payloadAsU32String()
             break;
         default:
             //auto ass = std::string(mText, length);
+            strval = "[" + std::to_string((int32_t)val.type) + "] " + std::string(&mText[pos], length - pos);
+            pos = length;
+            result = std::u32string(strval.begin(),strval.end());
             break;
         }
-    }
-    if (result == U"") {
-        auto ass = std::string(mText, length);
-        return U"X";
     }
     return result;
 }
