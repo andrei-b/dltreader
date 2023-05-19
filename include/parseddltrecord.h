@@ -115,10 +115,28 @@ public:
     void setPayload(const char * src, uint16_t length);
     std::string rawDataAsString();
     template <typename StringT>
-    StringT payloadAs()
+    StringT payloadAsString(bool whitewashNewlines = false)
     {
         if (parsedPayload.size() == 0)
             parsePayload();
+        std::u32string newLine = U"\n";
+        std::u32string newLineReplace = U"\\n";
+        std::u32string cReturn = U"\r";
+        std::u32string cReturnReplace = U"\\r";
+        if (whitewashNewlines) {
+            auto tmpPalyload = parsedPayload;
+            auto pos = tmpPalyload.find(newLine);
+            while(pos != std::u32string::npos) {
+                tmpPalyload.replace(pos, newLine.size(), newLineReplace);
+                pos = tmpPalyload.find(newLine, pos);
+            }
+            pos = tmpPalyload.find(cReturn);
+            while(pos != std::u32string::npos) {
+                tmpPalyload.replace(pos, cReturn.size(), cReturnReplace);
+                pos = tmpPalyload.find(cReturn);
+            }
+            return StringT(tmpPalyload.begin(), tmpPalyload.end());
+        }
         return StringT(parsedPayload.begin(), parsedPayload.end());
     }
     uint32_t num() const;
@@ -151,7 +169,37 @@ public:
     void setPayloadSize(uint16_t newPayloadSize);
     struct std::tm wallTime(int32_t shift = 0);
     template <typename StringT>
-    StringT walltimeAs (const std::string& format, int32_t shift = 0)
+    StringT typeToString ()
+    {
+        std::string s = dltMessageTypeToString.at(type());
+        return StringT(s.begin(), s.end());
+    }
+    template <typename StringT>
+    StringT modeToString ()
+    {
+        std::string s = dltLogModeToString.at(mode());
+        return StringT(s.begin(), s.end());
+    }
+    template <typename StringT>
+    StringT apidToString ()
+    {
+        auto t = apid();
+        return StringT(t.data, t.data+4);
+    }
+    template <typename StringT>
+    StringT ctidToString ()
+    {
+        auto t = ctid();
+        return StringT(t.data, t.data+4);
+    }
+    template <typename StringT>
+    StringT ecuToString ()
+    {
+        auto t = ecu();
+        return StringT(t.data, t.data+4);
+    }
+    template <typename StringT>
+    StringT walltimeToString (const std::string& format, int32_t shift = 0)
     {
         auto tm = wallTime(shift);
         std::ostringstream oss;
@@ -161,14 +209,10 @@ public:
         return StringT(s.begin(), s.end());
     }
     template <typename StringT>
-    StringT recordToString (const std::string& format, const std::string& walltimeFormat, int32_t walltimeShift = 0, bool noNewlinesAtPayload = false)
+    StringT recordToString (const std::string& format, const std::string& walltimeFormat, int32_t walltimeShift = 0, bool whitewashNewlines = false)
     {
-        auto tm = wallTime(shift);
-        std::ostringstream oss;
-        oss << std::put_time(&tm, format.data());
-        auto s = oss.str();
-        s = s.replace(s.find("{microseconds}"), 14, std::to_string(mMicroseconds));
-        return StringT(s.begin(), s.end());
+        auto wtime = walltimeToString<StringT>(walltimeFormat, walltimeShift);
+        auto payload = payloadAsString<StringT>(whitewashNewlines);
     }
 private:
     void parsePayload();
