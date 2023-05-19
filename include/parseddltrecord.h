@@ -13,10 +13,13 @@
 #define PARSEDDLTRECORD_H
 
 #include "dltfilerecord.h"
+#include "frozen/map.h"
+#include "frozen/string.h"
 #include <string>
 #include <memory>
 #include <ctime>
 #include <iomanip>
+#include <map>
 
 namespace DLTReader
 {
@@ -78,11 +81,19 @@ struct TextId {
 };
 
 enum class DLTMessageType {
-    DltTypeUnknown = -2,
-    DltTypeLog = 0,
-    DltTypeAppTrace,
-    DltTypeNwTrace,
-    DltTypeControl
+    Unknown = -2,
+    Log = 0,
+    AppTrace,
+    NwTrace,
+    Control
+};
+
+constexpr frozen::map<DLTMessageType, frozen::string, 5> dltMessageTypeToString = {
+    {DLTMessageType::Unknown, "unknown"},
+    {DLTMessageType::Log, "log"},
+    {DLTMessageType::Control, "control"},
+    {DLTMessageType::AppTrace, "app trace"},
+    {DLTMessageType::NwTrace, "nw trace"}
 };
 
 enum class DLTLogMode {
@@ -90,21 +101,25 @@ enum class DLTLogMode {
     NonVerbose
 };
 
-const std::string DefaultTimeFormat = "%d-%m-%Y %H:%M:%S";
+constexpr frozen::map<DLTLogMode, frozen::string, 2> dltLogModeToString = {
+    {DLTLogMode::Verbose, "verbose"},
+    {DLTLogMode::NonVerbose, "non-verbose"},
+};
 
 class ParsedDLTRecord
 {
 public:
+    static constexpr char DefaultTimeFormat[] = "%d-%m-%Y %H:%M:%S.{microseconds}";
     ParsedDLTRecord();
     explicit ParsedDLTRecord(const DLTFileRecord &record);
     void setPayload(const char * src, uint16_t length);
     std::string rawDataAsString();
-    template <typename T>
-    T payloadAs()
+    template <typename StringT>
+    StringT payloadAs()
     {
         if (parsedPayload.size() == 0)
             parsePayload();
-        return T(parsedPayload.begin(), parsedPayload.end());
+        return StringT(parsedPayload.begin(), parsedPayload.end());
     }
     uint32_t num() const;
     void setNum(uint32_t newNum);
@@ -135,14 +150,25 @@ public:
     uint16_t payloadSize() const;
     void setPayloadSize(uint16_t newPayloadSize);
     struct std::tm wallTime(int32_t shift = 0);
-    template <typename T>
-    T timeAs(const std::string& format, int32_t shift = 0)
+    template <typename StringT>
+    StringT walltimeAs (const std::string& format, int32_t shift = 0)
     {
         auto tm = wallTime(shift);
         std::ostringstream oss;
         oss << std::put_time(&tm, format.data());
         auto s = oss.str();
-        return T(s.begin(), s.end());
+        s = s.replace(s.find("{microseconds}"), 14, std::to_string(mMicroseconds));
+        return StringT(s.begin(), s.end());
+    }
+    template <typename StringT>
+    StringT recordToString (const std::string& format, const std::string& walltimeFormat, int32_t walltimeShift = 0, bool noNewlinesAtPayload = false)
+    {
+        auto tm = wallTime(shift);
+        std::ostringstream oss;
+        oss << std::put_time(&tm, format.data());
+        auto s = oss.str();
+        s = s.replace(s.find("{microseconds}"), 14, std::to_string(mMicroseconds));
+        return StringT(s.begin(), s.end());
     }
 private:
     void parsePayload();

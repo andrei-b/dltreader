@@ -157,7 +157,6 @@ std::u32string PayloadParser::payloadAsU32String()
             result = result + U"[Binary Data]";
             break;
         default:
-            //auto ass = std::string(mText, length);
             strval = "[" + std::to_string((int32_t)val.type) + "] " + std::string(&mText[pos], length - pos);
             pos = length;
             result = std::u32string(strval.begin(),strval.end());
@@ -172,8 +171,6 @@ std::string PayloadParser::payloadAsString()
     auto s32 = payloadAsU32String();
     return std::string(s32.begin(), s32.end());
 }
-
-
 
 const char *PayloadValue::data() const {
     switch (type) {
