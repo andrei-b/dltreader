@@ -14,70 +14,56 @@
 
 namespace DLTReader {
 
-ApIdFilter::ApIdFilter(bool positive, TextIdSet &&set) : positive(positive), set(std::move(set))
+template<TextIDField F>
+bool TextIdFilter<F>::operator()(DLTFileRecord &record) const
+{
+    return match(record);
+}
+
+template<TextIDField F>
+TextIdFilter<F>::TextIdFilter(bool positiveFilter, const TextIdSet &set): positiveFilter(positiveFilter), set(set)
 {
 
 }
 
-bool ApIdFilter::match(DLTFileRecord &record) const
+template<TextIDField F>
+bool TextIdFilter<F>::match(DLTFileRecord &record) const
 {
     if (!record.headerParsed)
         record.lightParse();
     for (const auto & id : set) {
-        if (id == record.apid) {
-            return positive;
+        if (id == getFiled<F>(record)) {
+            return positiveFilter;
         }
     }
-    return !positive;
+    return !positiveFilter;
 }
 
-bool ApIdFilter::match(const DLTRecordSet &records)
+template<TextIDField F>
+bool TextIdFilter<F>::match(const DLTRecordSet &records)
 {
 
 }
 
-CtIdFilter::CtIdFilter(bool positive, TextIdSet &&set) : positive(positive), set(std::move(set))
+template<TextIDField F>
+template <TextIDField f, std::enable_if_t<(f == TextIDField::ApId)>*>
+TextId TextIdFilter<F>::getFiled(DLTFileRecord &record) const
 {
-
+    return record.apid;
 }
 
-bool CtIdFilter::match(DLTFileRecord &record) const
+template<TextIDField F>
+template <TextIDField f, std::enable_if_t<(f == TextIDField::CtId)>*>
+TextId TextIdFilter<F>::getFiled(DLTFileRecord &record) const
 {
-    if (!record.headerParsed)
-        record.lightParse();
-    for (const auto & id : set) {
-        if (id == record.ctid) {
-            return positive;
-        }
-    }
-    return !positive;
+    return record.ctid;
 }
 
-bool CtIdFilter::match(const DLTRecordSet &records)
+template<TextIDField F>
+template <TextIDField f, std::enable_if_t<(f == TextIDField::Ecu)>*>
+TextId TextIdFilter<F>::getFiled(DLTFileRecord &record) const
 {
-
-}
-
-EcuFilter::EcuFilter(bool positive, TextIdSet &&set) : positive(positive), set(std::move(set))
-{
-
-}
-
-bool EcuFilter::match(DLTFileRecord &record) const
-{
-    if (!record.headerParsed)
-        record.lightParse();
-    for (const auto & id : set) {
-        if (id == record.ecu) {
-            return positive;
-        }
-    }
-    return !positive;
-}
-
-bool EcuFilter::match(const DLTRecordSet &records)
-{
-
+    return record.ecu;
 }
 
 }

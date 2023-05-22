@@ -12,6 +12,7 @@
 #ifndef TEXTIDFILTER_H
 #define TEXTIDFILTER_H
 
+#include "dltfilerecord.h"
 #include "dltfilterbase.h"
 #include "parseddltrecord.h"
 #include <vector>
@@ -19,41 +20,43 @@
 namespace DLTReader
 {
 
- using TextIdSet = std::vector<TextId>;
+using TextIdSet = std::vector<TextId>;
 
 
-class ApIdFilter: public DLTFilterBase
+enum class TextIDField
 {
-public:
-    ApIdFilter(bool positive, TextIdSet && set);
-    bool virtual match(DLTFileRecord &record) const override;
-    bool virtual match(const DLTRecordSet &records) override;
-private:
-    bool positive = true;
-    TextIdSet set;
+    ApId = 0,
+    CtId,
+    Ecu
 };
 
-class CtIdFilter: public DLTFilterBase
+template<enum TextIDField F>
+class TextIdFilter: public DLTFilterBase
 {
 public:
-    CtIdFilter(bool positive, TextIdSet && set);
+    TextIdFilter(bool positiveFilter, const TextIdSet & set);
     bool virtual match(DLTFileRecord &record) const override;
     bool virtual match(const DLTRecordSet & records) override;
+    bool operator()(DLTFileRecord &record) const override;
 private:
-    bool positive = true;
+    bool positiveFilter = true;
     TextIdSet set;
+    template <TextIDField f = F, std::enable_if_t<(f == TextIDField::ApId)>* = nullptr>
+    inline TextId getFiled(DLTFileRecord & record) const;
+    template <TextIDField f = F, std::enable_if_t<(f == TextIDField::CtId)>* = nullptr>
+    inline TextId getFiled(DLTFileRecord & record) const;
+    template <TextIDField f = F, std::enable_if_t<(f == TextIDField::Ecu)>* = nullptr>
+    inline TextId getFiled(DLTFileRecord & record) const;
+
 };
 
-class EcuFilter: public DLTFilterBase
-{
-public:
-    EcuFilter(bool positive, TextIdSet && set);
-    bool virtual match(DLTFileRecord &record) const override;
-    bool virtual match(const DLTRecordSet &records) override;
-private:
-    bool positive = true;
-    TextIdSet set;
-};
+template class TextIdFilter<TextIDField::ApId>;
+template class TextIdFilter<TextIDField::CtId>;
+template class TextIdFilter<TextIDField::Ecu>;
+
+using ApIdFilter = TextIdFilter<TextIDField::ApId>;
+using CtIdFilter = TextIdFilter<TextIDField::CtId>;
+using EcuFilter = TextIdFilter<TextIDField::Ecu>;
 
 }
 

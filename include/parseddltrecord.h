@@ -25,7 +25,7 @@ namespace DLTReader
 {
 
 struct TextId {
-    TextId(TextId & other)
+    TextId(const TextId & other)
     {
         *this = other;
     }

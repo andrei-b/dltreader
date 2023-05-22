@@ -15,6 +15,7 @@
 #include "transferredfiles.h"
 #include "payloadparser.h"
 #include "version.h"
+#include <textidfilter.h>
 #include <iostream>
 #include <stdio.h>
 
@@ -23,15 +24,20 @@ using namespace std;
 
 int main()
 {
+    DLTReader::TextId t1 = "HMI ";
+    DLTReader::TextIdSet set;
+    set.push_back("HMI");
+    DLTReader::TextIdFilter<DLTReader::TextIDField::ApId> filter(true, set);
     DLTReader::DirectDLTFile f1("/home/andrei/Downloads/test1.dlt");
     DLTReader::ParsedDLTRecord pr;
     for(auto r : f1) {
-         r.lightParse();
-         DLTReader::PayloadParser pp(r.payload,r.payloadLength);
+        if (filter.match(r)) {
+        DLTReader::PayloadParser pp(r.payload,r.payloadLength);
         DLTReader::ParsedDLTRecord pr(r);
          std::cout << pr.recordToString<std::string>("{num}\t{ecu}\t{apid}\t{ctid}\t{sessid}\t{type}\t{mode}\t{walltime}\t{timestamp}\t{payload}", DLTReader::ParsedDLTRecord::DefaultTimeFormat) << std::endl;
+        }
 
-        if (r.num > 10000)
+        if (r.num > 100000)
             break;
     }
     std::cout << pr.num() << "  " << pr.offset() << "  " << pr.rawDataAsString() << std::endl;
