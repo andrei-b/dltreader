@@ -34,6 +34,7 @@ public:
     DLTRecordCollection(DLTIndexedRecordIterator begin, DLTIndexedRecordIterator end);
     DLTRecordCollection select(const DLTFilterBase & filter);
     DLTRecordCollection select(const std::string &payload, bool re) const;
+    DLTRecordCollection select(uint32_t startNum, uint32_t endNum);
     void filter(const DLTFilterBase & filter);
     void append(DLTRecordCollection & collection);
     void append(const DLTFileRecord & record);
@@ -41,6 +42,7 @@ public:
     DLTRecordCollection join(DLTRecordCollection & collection) const;
     DLTIndexedRecordIterator find(const DLTFilterBase & filter, DLTIndexedRecordIterator startFrom);
     DLTIndexedRecordIterator find(const std::string &payload, bool re, DLTIndexedRecordIterator startFrom) ;
+    DLTIndexedRecordIterator find(uint32_t recordNum);
     DLTIndexedRecordIterator begin();
     DLTIndexedRecordIterator end();
     std::string fileName() const;
@@ -58,6 +60,7 @@ private:
     DLTRecordCollection(SparceIndex && index, const std::string & fileName);
     template <typename Iterator>
     SparceIndex selectInternal(Iterator begin, Iterator end, const DLTFilterBase & filter);
+    uint32_t firstRecNotLessThanNumToIndex(uint32_t recNum);
     std::string mFileName;
     SparceIndex index;
     std::ifstream file;
@@ -67,7 +70,7 @@ private:
 class DLTIndexedRecordIterator
 {
 public:
-    explicit DLTIndexedRecordIterator(DLTRecordCollection &collection);
+    explicit DLTIndexedRecordIterator(DLTRecordCollection &collection, uint32_t recordIndex = 0);
     typedef DLTFileRecord value_type;
     typedef uint64_t difference_type;
     typedef DLTFileRecord * pointer;
@@ -87,7 +90,6 @@ public:
     DLTIndexedRecordIterator operator+(const difference_type& diff);
     DLTIndexedRecordIterator operator-(const difference_type& diff);
 
-    static DLTIndexedRecordIterator makeEndIterator(DLTRecordCollection &c);
     std::string fileName() const;
 private:
     DLTRecordCollection & collection;

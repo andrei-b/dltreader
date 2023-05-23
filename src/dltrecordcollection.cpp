@@ -47,6 +47,16 @@ DLTRecordCollection DLTRecordCollection::select(const DLTFilterBase &filter)
     return DLTRecordCollection(*this, filter);
 }
 
+DLTRecordCollection DLTRecordCollection::select(uint32_t startNum, uint32_t endNum)
+{
+    uint32_t i1 = firstRecNotLessThanNumToIndex(startNum);
+    uint32_t i2 = firstRecNotLessThanNumToIndex(endNum);
+    SparceIndex newIndex;
+    newIndex.fileName = index.fileName;
+    newIndex.records = std::vector<SparceIndexRecord>(index.records.begin()+i1, index.records.begin()+i2);
+    return DLTRecordCollection(std::move(newIndex), newIndex.fileName);
+}
+
 void DLTRecordCollection::filter(const DLTFilterBase &filter)
 {
     index = selectInternal<DLTIndexedRecordIterator>(begin(), end(), filter);
@@ -92,6 +102,11 @@ DLTIndexedRecordIterator DLTRecordCollection::find(const std::string &payload, b
 
 }
 
+DLTIndexedRecordIterator DLTRecordCollection::find(uint32_t recordNum)
+{
+    return DLTIndexedRecordIterator(*this, firstRecNotLessThanNumToIndex(recordNum));
+}
+
 DLTIndexedRecordIterator DLTRecordCollection::begin()
 {
     return DLTIndexedRecordIterator(*this);
@@ -99,7 +114,7 @@ DLTIndexedRecordIterator DLTRecordCollection::begin()
 
 DLTIndexedRecordIterator DLTRecordCollection::end()
 {
-    return DLTIndexedRecordIterator::makeEndIterator(*this);
+    return DLTIndexedRecordIterator(*this, recordCount());
 }
 
 std::string DLTRecordCollection::fileName() const
@@ -168,6 +183,12 @@ DLTRecordCollection::DLTRecordCollection(SparceIndex &&index, const std::string 
     buffer.reserve(BufferSize);
 }
 
+uint32_t DLTRecordCollection::firstRecNotLessThanNumToIndex(uint32_t recNum)
+{
+    constexpr auto comp = [](const SparceIndexRecord & r1, const SparceIndexRecord & r2) -> bool {return r1.srcNum < r2.srcNum;};
+    return std::lower_bound(index.records.begin(), index.records.end(), SparceIndexRecord{recNum}, comp) - index.records.begin();
+}
+
 template<typename Iterator>
 SparceIndex DLTRecordCollection::selectInternal(Iterator begin, Iterator end, const DLTFilterBase &filter)
 {
@@ -182,10 +203,12 @@ SparceIndex DLTRecordCollection::selectInternal(Iterator begin, Iterator end, co
     return result;
 }
 
-DLTIndexedRecordIterator::DLTIndexedRecordIterator(DLTRecordCollection &collection) : collection(collection)
+DLTIndexedRecordIterator::DLTIndexedRecordIterator(DLTRecordCollection &collection, uint32_t recordIndex) : collection(collection)
 {
-    collection.fileOpen();
-    record = collection.fileRead(0);
+    if (!collection.fileOpen())
+        currentIndex = collection.recordCount();
+    else
+        record = collection.fileRead(recordIndex);
 }
 
 DLTFileRecord DLTIndexedRecordIterator::operator *() const
@@ -246,13 +269,6 @@ DLTIndexedRecordIterator DLTIndexedRecordIterator::operator+(const difference_ty
     else currentIndex = collection.recordCount();
     record = collection.fileRead(currentIndex);
     return *this;
-}
-
-DLTIndexedRecordIterator DLTIndexedRecordIterator::makeEndIterator(DLTRecordCollection &c)
-{
-    DLTIndexedRecordIterator result(c);
-    result.currentIndex = c.recordCount();
-    return result;
 }
 
 std::string DLTIndexedRecordIterator::fileName() const
