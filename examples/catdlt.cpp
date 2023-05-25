@@ -27,7 +27,7 @@ int main()
     DLTReader::TextId t1 = "HMI ";
     DLTReader::TextIdSet set;
     set.push_back("HMI");
-    DLTReader::TextIdFilter<DLTReader::TextIDField::ApId> filter(true, set);
+    DLTReader::TextIdFilter<DLTReader::TextIDField::ApId> filter(false, true, set);
     DLTReader::DirectDLTFile f1("/home/andrei/Downloads/test1.dlt");
     DLTReader::ParsedDLTRecord pr;
     for(auto r : f1) {

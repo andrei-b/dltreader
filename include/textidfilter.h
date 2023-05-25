@@ -31,13 +31,12 @@ enum class TextIDField
 };
 
 template<enum TextIDField F>
-class TextIdFilter: public DLTFilterBase
+class TextIdFilter: public DLTTextFilter
 {
 public:
-    TextIdFilter(bool positiveFilter, const TextIdSet & set);
+    TextIdFilter(bool regEx, bool positiveFilter, const TextIdSet & set);
     bool virtual match(DLTFileRecord &record) const override;
     bool virtual match(const DLTRecordSet & records) override;
-    bool operator()(DLTFileRecord &record) const override;
 private:
     bool positiveFilter = true;
     TextIdSet set;

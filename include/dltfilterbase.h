@@ -22,8 +22,27 @@ class DLTFilterBase
 public:
     virtual bool match(DLTFileRecord & record) const = 0;
     bool virtual match(const DLTRecordSet & records) = 0;
-    bool virtual operator()(DLTFileRecord & record) const = 0;
- };
+    bool virtual operator()(DLTFileRecord & record) const
+    {
+        return match(record);
+    }
+};
+
+class DLTTextFilter : public DLTFilterBase
+{
+public:
+    DLTTextFilter(bool regEx) : regEx(regEx)
+    {
+    }
+    bool isRegEx() const;
+private:
+    bool regEx;
+};
+
+inline bool DLTTextFilter::isRegEx() const
+{
+    return regEx;
+}
 
 }
 

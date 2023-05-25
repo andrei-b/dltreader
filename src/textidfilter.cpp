@@ -15,13 +15,7 @@
 namespace DLTReader {
 
 template<TextIDField F>
-bool TextIdFilter<F>::operator()(DLTFileRecord &record) const
-{
-    return match(record);
-}
-
-template<TextIDField F>
-TextIdFilter<F>::TextIdFilter(bool positiveFilter, const TextIdSet &set): positiveFilter(positiveFilter), set(set)
+TextIdFilter<F>::TextIdFilter(bool regEx, bool positiveFilter, const TextIdSet &set): DLTTextFilter(regEx), positiveFilter(positiveFilter), set(set)
 {
 
 }
